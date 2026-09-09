@@ -1,58 +1,188 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Painel de Deputados
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplicação desenvolvida em Laravel para consumir a API de Dados Abertos da Câmara dos Deputados, armazenar deputados e despesas parlamentares em MySQL e disponibilizar esses dados para consulta.
 
-## About Laravel
+O projeto utiliza Jobs e filas do Laravel para processar a sincronização das despesas em segundo plano: depois que os deputados são importados, uma Job independente é criada para cada parlamentar.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tecnologias
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.5
+- Laravel 13
+- MySQL 8.4
+- Laravel Queues com driver de banco de dados
+- Docker e Docker Compose
+- PHPUnit
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Arquitetura da sincronização
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```text
+API de Dados Abertos da Câmara
+              |
+              v
+   Comando camara:sync-deputies
+              |
+              +----> salva ou atualiza os deputados no MySQL
+              |
+              +----> cria uma Job para cada deputado
+                              |
+                              v
+                  Worker da fila expenses
+                              |
+                              v
+                  salva ou atualiza despesas
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+A importação é idempotente. Executar a sincronização novamente atualiza os registros existentes sem duplicar deputados ou despesas.
 
-## Contributing
+## Funcionalidades implementadas
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- Cliente HTTP para a API da Câmara;
+- paginação automática de deputados e despesas;
+- limite de 100 registros por requisição;
+- repetição automática em falhas temporárias;
+- validação de respostas inesperadas da API;
+- persistência de deputados e despesas no MySQL;
+- uma Job assíncrona por deputado;
+- prevenção de Jobs e despesas duplicadas;
+- filtros preparados no banco por partido, UF, ano e mês;
+- testes automatizados para models, cliente HTTP, comando e Job.
 
-## Code of Conduct
+## Requisitos
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Para executar o projeto é necessário ter Git e Docker Desktop com o Docker Engine ativo.
 
-## Security Vulnerabilities
+Não é necessário instalar PHP, Composer ou MySQL diretamente no computador.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Instalação
 
-## License
+Clone o repositório e entre na pasta:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+git clone https://github.com/AlfredoMelloDev/api-deputados-laravel.git
+cd api-deputados-laravel
+```
+
+Crie o arquivo de ambiente.
+
+No Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+No Linux ou macOS:
+
+```bash
+cp .env.example .env
+```
+
+Instale as dependências PHP usando o Composer pelo Docker:
+
+```powershell
+docker run --rm --volume "${PWD}:/app" --workdir /app composer:2 composer install
+```
+
+Construa e inicie os serviços:
+
+```bash
+docker compose up -d --build
+```
+
+Gere a chave da aplicação e execute as migrations:
+
+```bash
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan migrate
+```
+
+A aplicação estará disponível em [http://localhost:8000](http://localhost:8000).
+
+## Serviços Docker
+
+| Serviço | Responsabilidade | Porta local |
+| --- | --- | --- |
+| `app` | Aplicação Laravel | `8000` |
+| `mysql` | Banco de dados MySQL | `3306` |
+| `queue` | Processamento das Jobs | — |
+
+Para verificar o estado dos serviços:
+
+```bash
+docker compose ps
+```
+
+Para interromper os serviços preservando o banco:
+
+```bash
+docker compose down
+```
+
+## Sincronização
+
+Para importar os deputados e enfileirar as despesas do ano atual:
+
+```bash
+docker compose exec app php artisan camara:sync-deputies
+```
+
+Para escolher um ano específico a partir de 2008:
+
+```bash
+docker compose exec app php artisan camara:sync-deputies --year=2026
+```
+
+O contêiner `queue` processa as Jobs automaticamente em segundo plano. O andamento pode ser acompanhado com:
+
+```bash
+docker compose logs -f queue
+```
+
+## Testes
+
+Execute toda a suíte:
+
+```bash
+docker compose exec app php artisan test
+```
+
+Formate o código conforme o padrão do Laravel:
+
+```bash
+docker compose exec app vendor/bin/pint
+```
+
+## API utilizada
+
+Documentação oficial: [Dados Abertos da Câmara dos Deputados](https://dadosabertos.camara.leg.br/swagger/api.html)
+
+Endpoints principais:
+
+```text
+GET /api/v2/deputados
+GET /api/v2/deputados/{id}/despesas
+```
+
+## Estrutura relevante
+
+```text
+app/
+|-- Console/Commands/SyncDeputiesCommand.php
+|-- Jobs/SyncDeputyExpenses.php
+|-- Models/Deputy.php
+|-- Models/Expense.php
+`-- Services/Camara/CamaraApiClient.php
+```
+
+## Próximas etapas
+
+- criar dashboard com indicadores gerais;
+- listar e filtrar deputados;
+- exibir o perfil e as despesas de cada deputado;
+- adicionar filtros por fornecedor, tipo de despesa e período;
+- criar gráficos e rankings;
+- registrar o histórico visual das sincronizações;
+- ampliar a cobertura de testes.
+
+## Autor
+
+Desenvolvido por [Alfredo Mello](https://github.com/AlfredoMelloDev).
