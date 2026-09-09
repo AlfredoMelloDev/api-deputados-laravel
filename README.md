@@ -108,6 +108,7 @@ A aplicação estará disponível em [http://localhost:8000](http://localhost:80
 | `app` | Aplicação Laravel | `8000` |
 | `mysql` | Banco de dados MySQL | `3306` |
 | `queue` | Processamento das Jobs | — |
+| `scheduler` | Agendamento automático das sincronizações | — |
 
 Para verificar o estado dos serviços:
 
@@ -140,6 +141,8 @@ O contêiner `queue` processa as Jobs automaticamente em segundo plano. O andame
 ```bash
 docker compose logs -f queue
 ```
+
+O serviço `scheduler` inicia automaticamente a sincronização do ano atual todos os dias, às 03:00 no horário de Brasília. Se uma carga do mesmo ano ainda estiver em andamento, outra não será iniciada.
 
 ## Testes
 
@@ -180,7 +183,6 @@ app/
 ## Próximas etapas
 
 - ampliar os gráficos e rankings;
-- automatizar a sincronização periódica;
 - adicionar alertas para falhas da API;
 - ampliar a cobertura de testes.
 

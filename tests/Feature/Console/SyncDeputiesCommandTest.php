@@ -3,6 +3,7 @@
 namespace Tests\Feature\Console;
 
 use App\Jobs\SyncDeputyExpenses;
+use App\Models\SyncRun;
 use App\Services\Camara\CamaraApiClient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -49,6 +50,31 @@ class SyncDeputiesCommandTest extends TestCase
             ->assertFailed();
 
         Queue::assertNothingPushed();
+    }
+
+    public function test_it_does_not_start_a_duplicate_synchronization(): void
+    {
+        Queue::fake();
+        SyncRun::query()->create([
+            'year' => 2026,
+            'status' => 'processing',
+            'total_deputies' => 513,
+            'started_at' => now(),
+        ]);
+
+        $this->artisan('camara:sync-deputies', ['--year' => 2026])
+            ->expectsOutput('Já existe uma sincronização de 2026 em andamento.')
+            ->assertSuccessful();
+
+        Queue::assertNothingPushed();
+        $this->assertDatabaseCount('sync_runs', 1);
+    }
+
+    public function test_the_deputies_synchronization_is_scheduled(): void
+    {
+        $this->artisan('schedule:list')
+            ->expectsOutputToContain('camara:sync-deputies')
+            ->assertSuccessful();
     }
 
     /** @return array<string, mixed> */

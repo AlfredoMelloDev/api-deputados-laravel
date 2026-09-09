@@ -28,6 +28,20 @@ services:
       mysql:
         condition: service_healthy
 
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: deputados_scheduler
+    restart: unless-stopped
+    working_dir: /var/www/html
+    command: php artisan schedule:work
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      mysql:
+        condition: service_healthy
+
   mysql:
     image: mysql:8.4
     container_name: deputados_mysql

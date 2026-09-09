@@ -24,6 +24,12 @@ class SyncDeputiesCommand extends Command
             return self::FAILURE;
         }
 
+        if (SyncRun::query()->where('year', $year)->where('status', 'processing')->exists()) {
+            $this->warn("Já existe uma sincronização de {$year} em andamento.");
+
+            return self::SUCCESS;
+        }
+
         $this->info('Buscando deputados na API da Câmara...');
         $deputies = collect($client->deputies())
             ->unique(fn (array $deputy): int => (int) $deputy['id'])
