@@ -35,4 +35,27 @@ class DeputyController extends Controller
             'states' => Deputy::query()->whereNotNull('state_acronym')->distinct()->orderBy('state_acronym')->pluck('state_acronym'),
         ]);
     }
+
+    public function show(Request $request, Deputy $deputy): View
+    {
+        $filters = $request->validate([
+            'year' => ['nullable', 'integer', 'digits:4', 'min:2008', 'max:'.now()->year],
+            'month' => ['nullable', 'integer', 'between:1,12'],
+            'type' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $expenseQuery = $deputy->expenses()
+            ->when($filters['year'] ?? null, fn ($query, int $year) => $query->where('year', $year))
+            ->when($filters['month'] ?? null, fn ($query, int $month) => $query->where('month', $month))
+            ->when($filters['type'] ?? null, fn ($query, string $type) => $query->where('expense_type', $type));
+
+        return view('deputies.show', [
+            'deputy' => $deputy,
+            'expenses' => (clone $expenseQuery)->latest('document_date')->latest('id')->paginate(20)->withQueryString(),
+            'expenseCount' => (clone $expenseQuery)->count(),
+            'expenseTotal' => (float) (clone $expenseQuery)->sum('net_value'),
+            'years' => $deputy->expenses()->distinct()->orderByDesc('year')->pluck('year'),
+            'types' => $deputy->expenses()->distinct()->orderBy('expense_type')->pluck('expense_type'),
+        ]);
+    }
 }

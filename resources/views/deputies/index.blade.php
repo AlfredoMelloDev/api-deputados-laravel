@@ -24,6 +24,7 @@
         .grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; padding-bottom:30px; }
         article { overflow:hidden; display:flex; min-height:210px; background:var(--card); border:1px solid var(--line); border-radius:16px; transition:.2s; }
         article:hover { transform:translateY(-3px); box-shadow:0 12px 28px #1a332314; }
+        .card-link { display:flex; width:100%; color:inherit; text-decoration:none; }
         article img { width:42%; object-fit:cover; object-position:top; background:#dce3dc; }
         .info { padding:20px 16px; display:flex; flex-direction:column; flex:1; }
         .tag { align-self:flex-start; padding:5px 8px; border-radius:99px; background:var(--lime); color:#20351d; font-size:11px; font-weight:850; }
@@ -61,13 +62,15 @@
     <section class="grid">
         @forelse($deputies as $deputy)
             <article>
-                <img src="{{ $deputy->photo_url }}" alt="Foto de {{ $deputy->name }}" loading="lazy">
-                <div class="info">
-                    <span class="tag">{{ $deputy->party_acronym ?: 'Sem partido' }}</span>
-                    <h3>{{ $deputy->name }}</h3>
-                    <span class="location">{{ $deputy->state_acronym ?: 'Estado não informado' }} · ID {{ $deputy->camara_id }}</span>
-                    <div class="expense">{{ $deputy->expenses_count }} despesas importadas<strong>R$ {{ number_format((float) ($deputy->expenses_sum_net_value ?? 0), 2, ',', '.') }}</strong></div>
-                </div>
+                <a class="card-link" href="{{ route('deputies.show', $deputy) }}">
+                    <img src="{{ $deputy->photo_url }}" alt="Foto de {{ $deputy->name }}" loading="lazy">
+                    <div class="info">
+                        <span class="tag">{{ $deputy->party_acronym ?: 'Sem partido' }}</span>
+                        <h3>{{ $deputy->name }}</h3>
+                        <span class="location">{{ $deputy->state_acronym ?: 'Estado não informado' }} · ID {{ $deputy->camara_id }}</span>
+                        <div class="expense">{{ $deputy->expenses_count }} despesas importadas<strong>R$ {{ number_format((float) ($deputy->expenses_sum_net_value ?? 0), 2, ',', '.') }}</strong></div>
+                    </div>
+                </a>
             </article>
         @empty
             <div class="empty"><strong>Nenhum deputado encontrado.</strong><br>Altere os filtros e tente novamente.</div>
