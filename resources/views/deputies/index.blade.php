@@ -13,7 +13,7 @@
         .eyebrow { color:var(--lime); font-size:12px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
         h1 { max-width:750px; margin:12px 0 10px; font-family:Georgia, serif; font-size:clamp(36px, 6vw, 68px); line-height:.98; font-weight:500; }
         header p { max-width:620px; margin:0; color:#d7e3dc; line-height:1.6; }
-        .filters { position:relative; margin-top:-38px; padding:18px; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 14px 40px #1a33231a; display:grid; grid-template-columns:2fr 1fr 1fr 1fr auto; gap:12px; }
+        .filters { position:relative; margin-top:-38px; padding:18px; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 14px 40px #1a33231a; display:grid; grid-template-columns:minmax(260px,2fr) minmax(150px,1fr) minmax(150px,1fr) minmax(125px,.75fr) auto; gap:12px; }
         input, select, button, .clear { min-height:48px; border-radius:10px; font:inherit; }
         input, select { width:100%; padding:0 14px; background:white; border:1px solid var(--line); color:var(--ink); }
         button { padding:0 22px; border:0; background:var(--green); color:white; font-weight:750; cursor:pointer; }
@@ -42,15 +42,16 @@
         .analytics { display:grid; grid-template-columns:repeat(3,1fr) 2fr; gap:14px; }
         .metric, .ranking { padding:20px; background:var(--card); border:1px solid var(--line); border-radius:16px; }
         .metric span { color:var(--muted); font-size:12px; }
-        .metric strong { display:block; margin-top:8px; color:var(--green); font:500 27px Georgia, serif; }
+        .metric strong { display:block; margin-top:8px; color:var(--green); font:500 clamp(21px,1.7vw,27px) Georgia, serif; line-height:1.15; white-space:nowrap; }
         .ranking h3 { margin:0 0 14px; font-size:14px; }
         .rank { margin-top:10px; }
         .rank-label { display:flex; justify-content:space-between; gap:12px; font-size:11px; }
         .rank-label span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .bar { height:6px; margin-top:5px; overflow:hidden; border-radius:99px; background:#e8e9e3; }
         .bar i { display:block; height:100%; border-radius:inherit; background:var(--green); }
+        @media (max-width:1100px) { .filters { grid-template-columns:2fr 1fr 1fr; } .filters button { grid-column:span 1; } }
         @media (max-width:900px) { .filters { grid-template-columns:1fr 1fr; } .grid { grid-template-columns:repeat(2,1fr); } .analytics { grid-template-columns:repeat(3,1fr); } .ranking { grid-column:1/-1; } }
-        @media (max-width:600px) { header { padding-top:35px; } .filters, .grid { grid-template-columns:1fr; } .summary { align-items:start; flex-direction:column; } article { min-height:190px; } }
+        @media (max-width:600px) { header { padding-top:35px; } .filters, .grid, .analytics { grid-template-columns:1fr; } .ranking { grid-column:auto; } .summary { align-items:start; flex-direction:column; } article { min-height:190px; } .metric strong { font-size:24px; } }
     </style>
 </head>
 <body>
@@ -66,7 +67,7 @@
         <input type="search" name="search" value="{{ request('search') }}" placeholder="Buscar pelo nome do deputado">
         <select name="party"><option value="">Todos os partidos</option>@foreach($parties as $party)<option value="{{ $party }}" @selected(request('party') === $party)>{{ $party }}</option>@endforeach</select>
         <select name="state"><option value="">Todos os estados</option>@foreach($states as $state)<option value="{{ $state }}" @selected(request('state') === $state)>{{ $state }}</option>@endforeach</select>
-        <select name="expense_year"><option value="">Ano das despesas: {{ $analyticsYear }}</option>@foreach($availableYears as $year)<option value="{{ $year }}" @selected((string) request('expense_year') === (string) $year)>{{ $year }}</option>@endforeach</select>
+        <select name="expense_year" aria-label="Ano das despesas"><option value="">Ano: {{ $analyticsYear }}</option>@foreach($availableYears as $year)<option value="{{ $year }}" @selected((string) request('expense_year') === (string) $year)>Ano: {{ $year }}</option>@endforeach</select>
         <button type="submit">Filtrar</button>
     </form>
     <section class="analytics-head"><div><h2>Visão geral de {{ $analyticsYear }}</h2><p>Indicadores atualizados a partir dos dados importados.</p></div></section>
