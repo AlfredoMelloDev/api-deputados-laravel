@@ -4,6 +4,7 @@ namespace Tests\Feature\Http;
 
 use App\Models\Deputy;
 use App\Models\Expense;
+use App\Models\SyncRun;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -46,5 +47,25 @@ class DeputyIndexTest extends TestCase
             ->assertSee('R$ 1.200,50')
             ->assertSee('PASSAGENS')
             ->assertDontSee('COMBUSTÍVEIS');
+    }
+
+    public function test_it_displays_the_latest_synchronization_runs(): void
+    {
+        SyncRun::query()->create([
+            'year' => 2025,
+            'status' => 'completed',
+            'total_deputies' => 513,
+            'processed_deputies' => 513,
+            'successful_jobs' => 513,
+            'expenses_received' => 42554,
+            'started_at' => now()->subMinute(),
+            'finished_at' => now(),
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Histórico de sincronizações')
+            ->assertSee('42.554 despesas')
+            ->assertSee('Concluída');
     }
 }

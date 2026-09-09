@@ -4,6 +4,7 @@ namespace Tests\Feature\Jobs;
 
 use App\Jobs\SyncDeputyExpenses;
 use App\Models\Deputy;
+use App\Models\SyncRun;
 use App\Services\Camara\CamaraApiClient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -35,6 +36,24 @@ class SyncDeputyExpensesTest extends TestCase
         ]);
         $this->assertNotNull($deputy->refresh()->expenses_synced_at);
         Http::assertSent(fn ($request): bool => str_contains($request->url(), 'idLegislatura=57'));
+    }
+
+    public function test_it_updates_the_synchronization_history(): void
+    {
+        $deputy = Deputy::factory()->create(['camara_id' => 204554, 'legislature_id' => 57]);
+        $run = SyncRun::query()->create(['year' => 2026, 'status' => 'processing', 'total_deputies' => 1, 'started_at' => now()]);
+        Http::fake(['*' => Http::response(['dados' => [$this->expensePayload(100.50)], 'links' => []])]);
+
+        (new SyncDeputyExpenses($deputy->id, 2026, $run->id))->handle(app(CamaraApiClient::class));
+
+        $this->assertDatabaseHas('sync_runs', [
+            'id' => $run->id,
+            'status' => 'completed',
+            'processed_deputies' => 1,
+            'successful_jobs' => 1,
+            'expenses_received' => 1,
+        ]);
+        $this->assertNotNull($run->refresh()->finished_at);
     }
 
     /** @return array<string, mixed> */

@@ -49,6 +49,15 @@
         .rank-label span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .bar { height:6px; margin-top:5px; overflow:hidden; border-radius:99px; background:#e8e9e3; }
         .bar i { display:block; height:100%; border-radius:inherit; background:var(--green); }
+        .history { margin-top:16px; padding:20px; background:var(--card); border:1px solid var(--line); border-radius:16px; }
+        .history-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+        .history-head h3 { margin:0; font-size:16px; }
+        .runs { display:grid; gap:8px; }
+        .run { display:grid; grid-template-columns:70px 1fr auto; align-items:center; gap:14px; padding:11px 0; border-top:1px solid var(--line); font-size:12px; }
+        .run:first-child { border-top:0; }
+        .run-progress { height:7px; overflow:hidden; border-radius:99px; background:#e8e9e3; }
+        .run-progress i { display:block; height:100%; background:var(--green); }
+        .status { color:var(--muted); white-space:nowrap; }
         @media (max-width:1100px) { .filters { grid-template-columns:2fr 1fr 1fr; } .filters button { grid-column:span 1; } }
         @media (max-width:900px) { .filters { grid-template-columns:1fr 1fr; } .grid { grid-template-columns:repeat(2,1fr); } .analytics { grid-template-columns:repeat(3,1fr); } .ranking { grid-column:1/-1; } }
         @media (max-width:600px) { header { padding-top:35px; } .filters, .grid, .analytics { grid-template-columns:1fr; } .ranking { grid-column:auto; } .summary { align-items:start; flex-direction:column; } article { min-height:190px; } .metric strong { font-size:24px; } }
@@ -85,6 +94,21 @@
             @endforelse
         </div>
     </section>
+    @if($syncRuns->isNotEmpty())
+        <section class="history">
+            <div class="history-head"><h3>Histórico de sincronizações</h3><span class="location">Processamento da API da Câmara</span></div>
+            <div class="runs">
+                @foreach($syncRuns as $run)
+                    @php($progress = $run->total_deputies > 0 ? min(100, ($run->processed_deputies / $run->total_deputies) * 100) : 100)
+                    <div class="run">
+                        <strong>{{ $run->year }}</strong>
+                        <div><div class="run-progress"><i style="width:{{ $progress }}%"></i></div><span class="location">{{ $run->processed_deputies }}/{{ $run->total_deputies }} deputados · {{ number_format($run->expenses_received, 0, ',', '.') }} despesas</span></div>
+                        <span class="status">{{ match($run->status) { 'completed' => 'Concluída', 'completed_with_errors' => 'Concluída com falhas', default => 'Em andamento' } }}</span>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    @endif
     <section class="summary">
         <div><h2>Representantes</h2><p>{{ $deputies->total() }} {{ $deputies->total() === 1 ? 'deputado encontrado' : 'deputados encontrados' }}</p></div>
         @if(request()->hasAny(['search', 'party', 'state', 'expense_year']))<a class="clear" href="{{ route('deputies.index') }}">Limpar filtros</a>@endif

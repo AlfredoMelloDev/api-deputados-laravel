@@ -4,11 +4,13 @@ namespace App\Jobs;
 
 use App\Models\Deputy;
 use App\Models\Expense;
+use App\Models\SyncRun;
 use App\Services\Camara\CamaraApiClient;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class SyncDeputyExpenses implements ShouldBeUnique, ShouldQueue
 {
@@ -24,6 +26,7 @@ class SyncDeputyExpenses implements ShouldBeUnique, ShouldQueue
     public function __construct(
         public int $deputyId,
         public int $year,
+        public ?int $syncRunId = null,
     ) {}
 
     public function uniqueId(): string
@@ -78,6 +81,13 @@ class SyncDeputyExpenses implements ShouldBeUnique, ShouldQueue
 
             $deputy->update(['expenses_synced_at' => $timestamp]);
         });
+
+        $this->syncRun()?->recordSuccess(count($records));
+    }
+
+    public function failed(?Throwable $exception): void
+    {
+        $this->syncRun()?->recordFailure();
     }
 
     /** @param array<string, mixed> $data */
@@ -93,5 +103,10 @@ class SyncDeputyExpenses implements ShouldBeUnique, ShouldQueue
             $data['cnpjCpfFornecedor'] ?? null,
             $data['tipoDespesa'] ?? null,
         ], JSON_THROW_ON_ERROR));
+    }
+
+    private function syncRun(): ?SyncRun
+    {
+        return $this->syncRunId === null ? null : SyncRun::query()->find($this->syncRunId);
     }
 }

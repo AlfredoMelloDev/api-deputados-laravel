@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\SyncDeputyExpenses;
 use App\Models\Deputy;
+use App\Models\SyncRun;
 use App\Services\Camara\CamaraApiClient;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
@@ -28,7 +29,14 @@ class SyncDeputiesCommand extends Command
             ->unique(fn (array $deputy): int => (int) $deputy['id'])
             ->values();
 
-        $this->withProgressBar($deputies, function (array $data) use ($year): void {
+        $syncRun = SyncRun::query()->create([
+            'year' => $year,
+            'status' => 'processing',
+            'total_deputies' => $deputies->count(),
+            'started_at' => now(),
+        ]);
+
+        $this->withProgressBar($deputies, function (array $data) use ($year, $syncRun): void {
             $deputy = Deputy::query()->updateOrCreate(
                 ['camara_id' => $data['id']],
                 [
@@ -43,7 +51,7 @@ class SyncDeputiesCommand extends Command
                 ],
             );
 
-            SyncDeputyExpenses::dispatch($deputy->id, $year)->onQueue('expenses');
+            SyncDeputyExpenses::dispatch($deputy->id, $year, $syncRun->id)->onQueue('expenses');
         });
 
         $this->newLine(2);

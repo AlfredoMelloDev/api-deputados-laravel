@@ -31,8 +31,13 @@ class SyncDeputiesCommandTest extends TestCase
 
         $this->assertDatabaseHas('deputies', ['camara_id' => 101, 'name' => 'Deputada Um']);
         $this->assertDatabaseCount('deputies', 2);
+        $this->assertDatabaseHas('sync_runs', [
+            'year' => 2026,
+            'status' => 'processing',
+            'total_deputies' => 2,
+        ]);
         Queue::assertPushed(SyncDeputyExpenses::class, 2);
-        Queue::assertPushed(fn (SyncDeputyExpenses $job): bool => $job->year === 2026);
+        Queue::assertPushed(fn (SyncDeputyExpenses $job): bool => $job->year === 2026 && $job->syncRunId !== null);
     }
 
     public function test_it_rejects_a_year_before_expense_data_exists(): void

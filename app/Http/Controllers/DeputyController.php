@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Deputy;
 use App\Models\Expense;
+use App\Models\SyncRun;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
@@ -56,6 +57,7 @@ class DeputyController extends Controller
             'analyticsYear' => $analyticsYear,
             'analytics' => $analytics,
             'topExpenseTypes' => $topExpenseTypes,
+            'syncRuns' => SyncRun::query()->latest('started_at')->limit(5)->get(),
         ]);
     }
 
