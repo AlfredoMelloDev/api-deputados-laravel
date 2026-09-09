@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http;
 
 use App\Models\Deputy;
+use App\Models\Expense;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -31,5 +32,19 @@ class DeputyIndexTest extends TestCase
             ->assertSee('Ana Souza')
             ->assertDontSee('Ana Lima')
             ->assertDontSee('Carlos Souza');
+    }
+
+    public function test_it_displays_analytics_for_the_selected_expense_year(): void
+    {
+        $deputy = Deputy::factory()->create();
+        Expense::factory()->for($deputy)->create(['year' => 2025, 'expense_type' => 'PASSAGENS', 'net_value' => 1200.50]);
+        Expense::factory()->for($deputy)->create(['year' => 2024, 'expense_type' => 'COMBUSTÍVEIS', 'net_value' => 300]);
+
+        $this->get('/?expense_year=2025')
+            ->assertOk()
+            ->assertSee('Visão geral de 2025')
+            ->assertSee('R$ 1.200,50')
+            ->assertSee('PASSAGENS')
+            ->assertDontSee('COMBUSTÍVEIS');
     }
 }

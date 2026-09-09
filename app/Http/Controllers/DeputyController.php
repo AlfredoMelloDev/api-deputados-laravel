@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Deputy;
+use App\Models\Expense;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,25 @@ class DeputyController extends Controller
             'search' => ['nullable', 'string', 'max:100'],
             'party' => ['nullable', 'string', 'max:20'],
             'state' => ['nullable', 'string', 'size:2'],
+            'expense_year' => ['nullable', 'integer', 'digits:4', 'min:2008', 'max:'.now()->year],
         ]);
+
+        $availableYears = Expense::query()->distinct()->orderByDesc('year')->pluck('year');
+        $analyticsYear = (int) ($filters['expense_year'] ?? ($availableYears->contains(2025) ? 2025 : ($availableYears->first() ?? now()->year)));
+        $yearExpenses = Expense::query()->where('year', $analyticsYear);
+
+        $analytics = [
+            'count' => (clone $yearExpenses)->count(),
+            'total' => (float) (clone $yearExpenses)->sum('net_value'),
+            'deputies' => (clone $yearExpenses)->distinct()->count('deputy_id'),
+        ];
+
+        $topExpenseTypes = (clone $yearExpenses)
+            ->selectRaw('expense_type, SUM(net_value) as total')
+            ->groupBy('expense_type')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
 
         $deputies = Deputy::query()
             ->withCount('expenses')
@@ -33,6 +52,10 @@ class DeputyController extends Controller
             'deputies' => $deputies,
             'parties' => Deputy::query()->whereNotNull('party_acronym')->distinct()->orderBy('party_acronym')->pluck('party_acronym'),
             'states' => Deputy::query()->whereNotNull('state_acronym')->distinct()->orderBy('state_acronym')->pluck('state_acronym'),
+            'availableYears' => $availableYears,
+            'analyticsYear' => $analyticsYear,
+            'analytics' => $analytics,
+            'topExpenseTypes' => $topExpenseTypes,
         ]);
     }
 
