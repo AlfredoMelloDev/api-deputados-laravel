@@ -49,6 +49,7 @@ A importação é idempotente. Executar a sincronização novamente atualiza os 
 - listagem pesquisável e página individual de cada deputado;
 - filtros de despesas por ano, mês, tipo, fornecedor e intervalo de datas;
 - histórico visual das sincronizações, com progresso, totais e falhas;
+- alertas visuais com o motivo de falhas na API ou nas tarefas da fila;
 - testes automatizados para models, cliente HTTP, comando e Job.
 
 ## Requisitos
@@ -183,7 +184,6 @@ app/
 ## Próximas etapas
 
 - ampliar os gráficos e rankings;
-- adicionar alertas para falhas da API;
 - ampliar a cobertura de testes.
 
 ## Autor

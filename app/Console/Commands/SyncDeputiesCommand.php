@@ -9,6 +9,7 @@ use App\Services\Camara\CamaraApiClient;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
+use Throwable;
 
 #[Signature('camara:sync-deputies {--year= : Ano das despesas que serão sincronizadas}')]
 #[Description('Sincroniza os deputados da Câmara e enfileira a importação de suas despesas')]
@@ -31,9 +32,25 @@ class SyncDeputiesCommand extends Command
         }
 
         $this->info('Buscando deputados na API da Câmara...');
-        $deputies = collect($client->deputies())
-            ->unique(fn (array $deputy): int => (int) $deputy['id'])
-            ->values();
+
+        try {
+            $deputies = collect($client->deputies())
+                ->unique(fn (array $deputy): int => (int) $deputy['id'])
+                ->values();
+        } catch (Throwable $exception) {
+            SyncRun::query()->create([
+                'year' => $year,
+                'status' => 'failed',
+                'last_error' => mb_substr($exception->getMessage(), 0, 2000),
+                'started_at' => now(),
+                'finished_at' => now(),
+            ]);
+
+            report($exception);
+            $this->error('Não foi possível consultar a API da Câmara. A falha foi registrada no histórico.');
+
+            return self::FAILURE;
+        }
 
         $syncRun = SyncRun::query()->create([
             'year' => $year,

@@ -58,6 +58,10 @@
         .run-progress { height:7px; overflow:hidden; border-radius:99px; background:#e8e9e3; }
         .run-progress i { display:block; height:100%; background:var(--green); }
         .status { color:var(--muted); white-space:nowrap; }
+        .alert { display:flex; gap:12px; margin-top:16px; padding:16px 18px; border:1px solid #e1b9ae; border-radius:14px; background:#fff4f0; color:#762d1d; }
+        .alert strong { display:block; margin-bottom:3px; }
+        .alert p { margin:0; color:#8b4a3d; font-size:13px; }
+        .run-error { display:block; margin-top:4px; color:#9b3d2b; }
         @media (max-width:1100px) { .filters { grid-template-columns:2fr 1fr 1fr; } .filters button { grid-column:span 1; } }
         @media (max-width:900px) { .filters { grid-template-columns:1fr 1fr; } .grid { grid-template-columns:repeat(2,1fr); } .analytics { grid-template-columns:repeat(3,1fr); } .ranking { grid-column:1/-1; } }
         @media (max-width:600px) { header { padding-top:35px; } .filters, .grid, .analytics { grid-template-columns:1fr; } .ranking { grid-column:auto; } .summary { align-items:start; flex-direction:column; } article { min-height:190px; } .metric strong { font-size:24px; } }
@@ -94,6 +98,10 @@
             @endforelse
         </div>
     </section>
+    @php($failedRun = $syncRuns->first(fn ($run) => in_array($run->status, ['failed', 'completed_with_errors'], true)))
+    @if($failedRun)
+        <aside class="alert" role="alert"><span>⚠</span><div><strong>A última sincronização apresentou falhas</strong><p>{{ $failedRun->last_error ?: 'Uma ou mais tarefas não puderam ser concluídas. Consulte o histórico.' }}</p></div></aside>
+    @endif
     @if($syncRuns->isNotEmpty())
         <section class="history">
             <div class="history-head"><h3>Histórico de sincronizações</h3><span class="location">Processamento da API da Câmara</span></div>
@@ -102,8 +110,8 @@
                     @php($progress = $run->total_deputies > 0 ? min(100, ($run->processed_deputies / $run->total_deputies) * 100) : 100)
                     <div class="run">
                         <strong>{{ $run->year }}</strong>
-                        <div><div class="run-progress"><i style="width:{{ $progress }}%"></i></div><span class="location">{{ $run->processed_deputies }}/{{ $run->total_deputies }} deputados · {{ number_format($run->expenses_received, 0, ',', '.') }} despesas</span></div>
-                        <span class="status">{{ match($run->status) { 'completed' => 'Concluída', 'completed_with_errors' => 'Concluída com falhas', default => 'Em andamento' } }}</span>
+                        <div><div class="run-progress"><i style="width:{{ $progress }}%"></i></div><span class="location">{{ $run->processed_deputies }}/{{ $run->total_deputies }} deputados · {{ number_format($run->expenses_received, 0, ',', '.') }} despesas</span>@if($run->last_error)<small class="run-error">{{ $run->last_error }}</small>@endif</div>
+                        <span class="status">{{ match($run->status) { 'completed' => 'Concluída', 'completed_with_errors' => 'Concluída com falhas', 'failed' => 'Falhou', default => 'Em andamento' } }}</span>
                     </div>
                 @endforeach
             </div>

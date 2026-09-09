@@ -77,6 +77,23 @@ class SyncDeputiesCommandTest extends TestCase
             ->assertSuccessful();
     }
 
+    public function test_it_records_a_failure_when_the_api_cannot_be_reached(): void
+    {
+        $this->mock(CamaraApiClient::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('deputies')->once()->andThrow(new \RuntimeException('API indisponível'));
+        });
+
+        $this->artisan('camara:sync-deputies', ['--year' => 2026])
+            ->expectsOutput('Não foi possível consultar a API da Câmara. A falha foi registrada no histórico.')
+            ->assertFailed();
+
+        $this->assertDatabaseHas('sync_runs', [
+            'year' => 2026,
+            'status' => 'failed',
+            'last_error' => 'API indisponível',
+        ]);
+    }
+
     /** @return array<string, mixed> */
     private function deputyPayload(int $id, string $name): array
     {

@@ -87,7 +87,7 @@ class SyncDeputyExpenses implements ShouldBeUnique, ShouldQueue
 
     public function failed(?Throwable $exception): void
     {
-        $this->syncRun()?->recordFailure();
+        $this->syncRun()?->recordFailure($exception?->getMessage());
     }
 
     /** @param array<string, mixed> $data */

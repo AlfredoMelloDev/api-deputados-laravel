@@ -61,11 +61,20 @@ class DeputyIndexTest extends TestCase
             'started_at' => now()->subMinute(),
             'finished_at' => now(),
         ]);
+        SyncRun::query()->create([
+            'year' => 2026,
+            'status' => 'failed',
+            'last_error' => 'API indisponível',
+            'started_at' => now()->addSecond(),
+            'finished_at' => now()->addSecond(),
+        ]);
 
         $this->get('/')
             ->assertOk()
             ->assertSee('Histórico de sincronizações')
             ->assertSee('42.554 despesas')
-            ->assertSee('Concluída');
+            ->assertSee('Concluída')
+            ->assertSee('A última sincronização apresentou falhas')
+            ->assertSee('API indisponível');
     }
 }

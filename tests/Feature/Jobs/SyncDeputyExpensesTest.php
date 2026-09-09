@@ -56,6 +56,20 @@ class SyncDeputyExpensesTest extends TestCase
         $this->assertNotNull($run->refresh()->finished_at);
     }
 
+    public function test_it_records_the_reason_when_a_job_fails(): void
+    {
+        $run = SyncRun::query()->create(['year' => 2026, 'status' => 'processing', 'total_deputies' => 1, 'started_at' => now()]);
+
+        (new SyncDeputyExpenses(999, 2026, $run->id))->failed(new \RuntimeException('Tempo limite excedido'));
+
+        $this->assertDatabaseHas('sync_runs', [
+            'id' => $run->id,
+            'status' => 'completed_with_errors',
+            'failed_jobs' => 1,
+            'last_error' => 'Tempo limite excedido',
+        ]);
+    }
+
     /** @return array<string, mixed> */
     private function expensePayload(float $netValue): array
     {
