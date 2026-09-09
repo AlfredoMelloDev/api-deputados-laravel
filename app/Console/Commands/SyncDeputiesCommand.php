@@ -24,7 +24,9 @@ class SyncDeputiesCommand extends Command
         }
 
         $this->info('Buscando deputados na API da Câmara...');
-        $deputies = $client->deputies();
+        $deputies = collect($client->deputies())
+            ->unique(fn (array $deputy): int => (int) $deputy['id'])
+            ->values();
 
         $this->withProgressBar($deputies, function (array $data) use ($year): void {
             $deputy = Deputy::query()->updateOrCreate(
@@ -45,7 +47,7 @@ class SyncDeputiesCommand extends Command
         });
 
         $this->newLine(2);
-        $this->info(count($deputies).' deputados sincronizados; despesas de '.$year.' adicionadas à fila.');
+        $this->info($deputies->count().' deputados sincronizados; despesas de '.$year.' adicionadas à fila.');
 
         return self::SUCCESS;
     }

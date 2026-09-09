@@ -21,6 +21,7 @@ class SyncDeputiesCommandTest extends TestCase
             $mock->shouldReceive('deputies')->once()->andReturn([
                 $this->deputyPayload(101, 'Deputada Um'),
                 $this->deputyPayload(202, 'Deputado Dois'),
+                $this->deputyPayload(101, 'Deputada Um'),
             ]);
         });
 
