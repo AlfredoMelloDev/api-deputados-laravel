@@ -34,7 +34,7 @@ class SyncDeputyExpenses implements ShouldBeUnique, ShouldQueue
     public function handle(CamaraApiClient $client): void
     {
         $deputy = Deputy::query()->findOrFail($this->deputyId);
-        $expenses = $client->expenses($deputy->camara_id, $this->year);
+        $expenses = $client->expenses($deputy->camara_id, $this->year, $deputy->legislature_id);
         $timestamp = now();
 
         $records = array_map(fn (array $data): array => [

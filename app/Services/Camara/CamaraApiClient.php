@@ -20,7 +20,7 @@ class CamaraApiClient
     }
 
     /** @return list<array<string, mixed>> */
-    public function expenses(int $deputyId, ?int $year = null, int $itemsPerPage = 100): array
+    public function expenses(int $deputyId, ?int $year = null, ?int $legislatureId = null, int $itemsPerPage = 100): array
     {
         if ($deputyId <= 0) {
             throw new InvalidArgumentException('O identificador do deputado deve ser positivo.');
@@ -34,6 +34,14 @@ class CamaraApiClient
 
         if ($year !== null) {
             $query['ano'] = $year;
+        }
+
+        if ($legislatureId !== null) {
+            if ($legislatureId <= 0) {
+                throw new InvalidArgumentException('O identificador da legislatura deve ser positivo.');
+            }
+
+            $query['idLegislatura'] = $legislatureId;
         }
 
         return $this->paginate("/deputados/{$deputyId}/despesas", $query);

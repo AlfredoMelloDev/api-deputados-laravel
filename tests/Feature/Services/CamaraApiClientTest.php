@@ -45,11 +45,18 @@ class CamaraApiClientTest extends TestCase
             ]),
         ]);
 
-        $expenses = app(CamaraApiClient::class)->expenses(204554, 2026);
+        $expenses = app(CamaraApiClient::class)->expenses(204554, 2026, 57);
 
         $this->assertSame(123, $expenses[0]['codDocumento']);
-        Http::assertSent(fn (Request $request): bool => $request->url() === 'https://dadosabertos.camara.leg.br/api/v2/deputados/204554/despesas?itens=100&ordem=ASC&ordenarPor=dataDocumento&ano=2026'
+        Http::assertSent(fn (Request $request): bool => $request->url() === 'https://dadosabertos.camara.leg.br/api/v2/deputados/204554/despesas?itens=100&ordem=ASC&ordenarPor=dataDocumento&ano=2026&idLegislatura=57'
         );
+    }
+
+    public function test_it_rejects_an_invalid_legislature_id(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        app(CamaraApiClient::class)->expenses(204554, 2026, 0);
     }
 
     public function test_it_rejects_an_invalid_page_size(): void

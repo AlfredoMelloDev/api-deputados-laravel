@@ -15,7 +15,7 @@ class SyncDeputyExpensesTest extends TestCase
 
     public function test_it_stores_expenses_idempotently_and_marks_the_deputy_as_synced(): void
     {
-        $deputy = Deputy::factory()->create(['camara_id' => 204554]);
+        $deputy = Deputy::factory()->create(['camara_id' => 204554, 'legislature_id' => 57]);
 
         Http::fake([
             '*' => Http::sequence()
@@ -34,6 +34,7 @@ class SyncDeputyExpensesTest extends TestCase
             'net_value' => 90.25,
         ]);
         $this->assertNotNull($deputy->refresh()->expenses_synced_at);
+        Http::assertSent(fn ($request): bool => str_contains($request->url(), 'idLegislatura=57'));
     }
 
     /** @return array<string, mixed> */
