@@ -65,12 +65,18 @@ class DeputyController extends Controller
             'year' => ['nullable', 'integer', 'digits:4', 'min:2008', 'max:'.now()->year],
             'month' => ['nullable', 'integer', 'between:1,12'],
             'type' => ['nullable', 'string', 'max:255'],
+            'supplier' => ['nullable', 'string', 'max:150'],
+            'date_from' => ['nullable', 'date'],
+            'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
         ]);
 
         $expenseQuery = $deputy->expenses()
             ->when($filters['year'] ?? null, fn ($query, int $year) => $query->where('year', $year))
             ->when($filters['month'] ?? null, fn ($query, int $month) => $query->where('month', $month))
-            ->when($filters['type'] ?? null, fn ($query, string $type) => $query->where('expense_type', $type));
+            ->when($filters['type'] ?? null, fn ($query, string $type) => $query->where('expense_type', $type))
+            ->when($filters['supplier'] ?? null, fn ($query, string $supplier) => $query->where('supplier_name', 'like', '%'.$supplier.'%'))
+            ->when($filters['date_from'] ?? null, fn ($query, string $date) => $query->whereDate('document_date', '>=', $date))
+            ->when($filters['date_to'] ?? null, fn ($query, string $date) => $query->whereDate('document_date', '<=', $date));
 
         return view('deputies.show', [
             'deputy' => $deputy,

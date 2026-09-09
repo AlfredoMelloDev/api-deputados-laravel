@@ -45,6 +45,9 @@ A importação é idempotente. Executar a sincronização novamente atualiza os 
 - uma Job assíncrona por deputado;
 - prevenção de Jobs e despesas duplicadas;
 - filtros preparados no banco por partido, UF, ano e mês;
+- painel com indicadores gerais e ranking de categorias;
+- listagem pesquisável e página individual de cada deputado;
+- filtros de despesas por ano, mês, tipo, fornecedor e intervalo de datas;
 - testes automatizados para models, cliente HTTP, comando e Job.
 
 ## Requisitos
@@ -175,11 +178,7 @@ app/
 
 ## Próximas etapas
 
-- criar dashboard com indicadores gerais;
-- listar e filtrar deputados;
-- exibir o perfil e as despesas de cada deputado;
-- adicionar filtros por fornecedor, tipo de despesa e período;
-- criar gráficos e rankings;
+- ampliar os gráficos e rankings;
 - registrar o histórico visual das sincronizações;
 - ampliar a cobertura de testes.
 

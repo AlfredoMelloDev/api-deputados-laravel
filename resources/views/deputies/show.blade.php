@@ -24,9 +24,10 @@
         h2 { margin:0; font:500 31px Georgia, serif; }
         .section-head p { margin:5px 0 0; color:var(--muted); }
         .clear { color:var(--green); font-weight:700; text-decoration:none; }
-        form { display:grid; grid-template-columns:1fr 1fr 2fr auto; gap:10px; padding:16px; background:var(--card); border:1px solid var(--line); border-radius:15px; margin-bottom:18px; }
-        select, button { min-height:46px; padding:0 13px; border-radius:9px; font:inherit; }
-        select { width:100%; background:white; color:var(--ink); border:1px solid var(--line); }
+        form { display:grid; grid-template-columns:repeat(6,1fr) auto; gap:10px; padding:16px; background:var(--card); border:1px solid var(--line); border-radius:15px; margin-bottom:18px; }
+        input, select, button { min-height:46px; padding:0 13px; border-radius:9px; font:inherit; }
+        input, select { width:100%; background:white; color:var(--ink); border:1px solid var(--line); }
+        .supplier { grid-column:span 2; }
         button { padding-inline:22px; border:0; background:var(--green); color:white; font-weight:750; cursor:pointer; }
         .table-box { overflow:auto; background:var(--card); border:1px solid var(--line); border-radius:15px; }
         table { width:100%; border-collapse:collapse; min-width:820px; }
@@ -41,7 +42,8 @@
         nav { display:flex; justify-content:center; gap:7px; padding:24px 0 50px; }
         nav a, nav span { min-width:38px; padding:9px 11px; text-align:center; border:1px solid var(--line); border-radius:9px; color:var(--green); text-decoration:none; background:var(--card); }
         nav span.active { color:white; background:var(--green); border-color:var(--green); }
-        @media(max-width:700px) { .profile { align-items:flex-start; } .profile img { width:105px; height:130px; } form { grid-template-columns:1fr; } .section-head { align-items:start; flex-direction:column; } }
+        @media(max-width:1000px) { form { grid-template-columns:repeat(2,1fr); } .supplier { grid-column:span 2; } }
+        @media(max-width:700px) { .profile { align-items:flex-start; } .profile img { width:105px; height:130px; } form { grid-template-columns:1fr; } .supplier { grid-column:auto; } .section-head { align-items:start; flex-direction:column; } }
     </style>
 </head>
 <body>
@@ -61,12 +63,15 @@
     </section>
     <section class="section-head">
         <div><h2>Despesas parlamentares</h2><p>Documentos importados da API oficial da Câmara.</p></div>
-        @if(request()->hasAny(['year', 'month', 'type']))<a class="clear" href="{{ route('deputies.show', $deputy) }}">Limpar filtros</a>@endif
+        @if(request()->hasAny(['year', 'month', 'type', 'supplier', 'date_from', 'date_to']))<a class="clear" href="{{ route('deputies.show', $deputy) }}">Limpar filtros</a>@endif
     </section>
     <form method="GET" action="{{ route('deputies.show', $deputy) }}">
         <select name="year"><option value="">Todos os anos</option>@foreach($years as $year)<option value="{{ $year }}" @selected((string) request('year') === (string) $year)>{{ $year }}</option>@endforeach</select>
         <select name="month"><option value="">Todos os meses</option>@foreach([1=>'Janeiro',2=>'Fevereiro',3=>'Março',4=>'Abril',5=>'Maio',6=>'Junho',7=>'Julho',8=>'Agosto',9=>'Setembro',10=>'Outubro',11=>'Novembro',12=>'Dezembro'] as $number=>$month)<option value="{{ $number }}" @selected((string) request('month') === (string) $number)>{{ $month }}</option>@endforeach</select>
         <select name="type"><option value="">Todos os tipos</option>@foreach($types as $type)<option value="{{ $type }}" @selected(request('type') === $type)>{{ $type }}</option>@endforeach</select>
+        <input class="supplier" type="search" name="supplier" value="{{ request('supplier') }}" placeholder="Buscar fornecedor">
+        <input type="date" name="date_from" value="{{ request('date_from') }}" aria-label="Data inicial">
+        <input type="date" name="date_to" value="{{ request('date_to') }}" aria-label="Data final">
         <button type="submit">Filtrar</button>
     </form>
     <div class="table-box">

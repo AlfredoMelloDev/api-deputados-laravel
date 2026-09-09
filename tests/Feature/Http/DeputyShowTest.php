@@ -40,4 +40,23 @@ class DeputyShowTest extends TestCase
             ->assertSee('R$ 100,00')
             ->assertDontSee('Companhia Aérea');
     }
+
+    public function test_it_filters_expenses_by_supplier_and_date_range(): void
+    {
+        $deputy = Deputy::factory()->create();
+        Expense::factory()->for($deputy)->create(['supplier_name' => 'Posto Central', 'document_date' => '2025-03-15']);
+        Expense::factory()->for($deputy)->create(['supplier_name' => 'Posto Avenida', 'document_date' => '2025-05-20']);
+        Expense::factory()->for($deputy)->create(['supplier_name' => 'Companhia Aérea', 'document_date' => '2025-03-15']);
+
+        $this->get(route('deputies.show', [
+            $deputy,
+            'supplier' => 'Posto',
+            'date_from' => '2025-03-01',
+            'date_to' => '2025-03-31',
+        ]))
+            ->assertOk()
+            ->assertSee('Posto Central')
+            ->assertDontSee('Posto Avenida')
+            ->assertDontSee('Companhia Aérea');
+    }
 }
