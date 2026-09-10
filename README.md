@@ -49,6 +49,7 @@ A importação é idempotente. Executar a sincronização novamente atualiza os 
 - gráfico de evolução mensal e ranking dos deputados com maiores despesas;
 - listagem pesquisável e página individual de cada deputado;
 - filtros de despesas por ano, mês, tipo, fornecedor e intervalo de datas;
+- exportação das despesas filtradas em CSV compatível com Excel;
 - histórico visual das sincronizações, com progresso, totais e falhas;
 - alertas visuais com o motivo de falhas na API ou nas tarefas da fila;
 - testes automatizados para models, cliente HTTP, comando e Job.
@@ -184,7 +185,7 @@ app/
 
 ## Próximas etapas
 
-- permitir a exportação dos resultados filtrados;
+- adicionar uma API JSON pública para consultas externas;
 - ampliar a cobertura de testes.
 
 ## Autor

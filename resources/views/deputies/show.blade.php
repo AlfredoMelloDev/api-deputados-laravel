@@ -24,6 +24,9 @@
         h2 { margin:0; font:500 31px Georgia, serif; }
         .section-head p { margin:5px 0 0; color:var(--muted); }
         .clear { color:var(--green); font-weight:700; text-decoration:none; }
+        .actions { display:flex; align-items:center; gap:14px; }
+        .export { padding:11px 15px; border:1px solid var(--green); border-radius:9px; color:var(--green); font-weight:750; text-decoration:none; white-space:nowrap; }
+        .export:hover { background:var(--green); color:white; }
         form { display:grid; grid-template-columns:repeat(6,1fr) auto; gap:10px; padding:16px; background:var(--card); border:1px solid var(--line); border-radius:15px; margin-bottom:18px; }
         input, select, button { min-height:46px; padding:0 13px; border-radius:9px; font:inherit; }
         input, select { width:100%; background:white; color:var(--ink); border:1px solid var(--line); }
@@ -63,7 +66,10 @@
     </section>
     <section class="section-head">
         <div><h2>Despesas parlamentares</h2><p>Documentos importados da API oficial da Câmara.</p></div>
-        @if(request()->hasAny(['year', 'month', 'type', 'supplier', 'date_from', 'date_to']))<a class="clear" href="{{ route('deputies.show', $deputy) }}">Limpar filtros</a>@endif
+        <div class="actions">
+            @if(request()->hasAny(['year', 'month', 'type', 'supplier', 'date_from', 'date_to']))<a class="clear" href="{{ route('deputies.show', $deputy) }}">Limpar filtros</a>@endif
+            <a class="export" href="{{ route('deputies.expenses.export', ['deputy' => $deputy] + request()->only(['year', 'month', 'type', 'supplier', 'date_from', 'date_to'])) }}">Baixar CSV ↓</a>
+        </div>
     </section>
     <form method="GET" action="{{ route('deputies.show', $deputy) }}">
         <select name="year"><option value="">Todos os anos</option>@foreach($years as $year)<option value="{{ $year }}" @selected((string) request('year') === (string) $year)>{{ $year }}</option>@endforeach</select>

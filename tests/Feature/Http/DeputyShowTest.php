@@ -25,7 +25,8 @@ class DeputyShowTest extends TestCase
             ->assertSee('Ana Souza')
             ->assertSee('PASSAGEM AÉREA')
             ->assertSee('Companhia Brasileira')
-            ->assertSee('R$ 1.250,50');
+            ->assertSee('R$ 1.250,50')
+            ->assertSee('Baixar CSV');
     }
 
     public function test_it_filters_expenses_and_recalculates_the_summary(): void
@@ -58,5 +59,33 @@ class DeputyShowTest extends TestCase
             ->assertSee('Posto Central')
             ->assertDontSee('Posto Avenida')
             ->assertDontSee('Companhia Aérea');
+    }
+
+    public function test_it_exports_only_filtered_expenses_as_a_safe_csv(): void
+    {
+        $deputy = Deputy::factory()->create(['name' => 'Ana Souza']);
+        Expense::factory()->for($deputy)->create([
+            'year' => 2025,
+            'supplier_name' => '=SOMA(1+1)',
+            'document_number' => 'NF-2025',
+            'net_value' => 150.75,
+        ]);
+        Expense::factory()->for($deputy)->create([
+            'year' => 2024,
+            'supplier_name' => 'Fornecedor Antigo',
+            'document_number' => 'NF-2024',
+        ]);
+
+        $response = $this->get(route('deputies.expenses.export', [$deputy, 'year' => 2025]));
+
+        $response->assertOk()
+            ->assertDownload('despesas-ana-souza-'.now()->format('Y-m-d').'.csv');
+
+        $content = $response->streamedContent();
+        $this->assertStringContainsString("'=SOMA(1+1)", $content);
+        $this->assertStringContainsString('NF-2025', $content);
+        $this->assertStringContainsString('150,75', $content);
+        $this->assertStringNotContainsString('Fornecedor Antigo', $content);
+        $this->assertStringNotContainsString('NF-2024', $content);
     }
 }
