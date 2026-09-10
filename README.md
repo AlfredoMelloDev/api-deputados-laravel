@@ -50,6 +50,7 @@ A importação é idempotente. Executar a sincronização novamente atualiza os 
 - listagem pesquisável e página individual de cada deputado;
 - filtros de despesas por ano, mês, tipo, fornecedor e intervalo de datas;
 - exportação das despesas filtradas em CSV compatível com Excel;
+- API JSON pública e versionada para deputados e despesas;
 - histórico visual das sincronizações, com progresso, totais e falhas;
 - alertas visuais com o motivo de falhas na API ou nas tarefas da fila;
 - testes automatizados para models, cliente HTTP, comando e Job.
@@ -161,6 +162,25 @@ Formate o código conforme o padrão do Laravel:
 docker compose exec app vendor/bin/pint
 ```
 
+## API JSON do projeto
+
+A API pública está disponível sob o prefixo `/api/v1`, retorna respostas paginadas e aceita até 60 requisições por minuto.
+
+```text
+GET /api/v1/deputados
+GET /api/v1/deputados/{idDaCamara}
+GET /api/v1/deputados/{idDaCamara}/despesas
+```
+
+Exemplos de filtros:
+
+```text
+/api/v1/deputados?nome=Ana&partido=PT&uf=SP&ano_despesas=2025&por_pagina=20
+/api/v1/deputados/74646/despesas?ano=2025&mes=3&fornecedor=Posto&por_pagina=50
+```
+
+Os filtros de despesas disponíveis são `ano`, `mes`, `tipo`, `fornecedor`, `data_inicial`, `data_final` e `por_pagina`. O limite máximo é de 100 registros por página.
+
 ## API utilizada
 
 Documentação oficial: [Dados Abertos da Câmara dos Deputados](https://dadosabertos.camara.leg.br/swagger/api.html)
@@ -185,7 +205,6 @@ app/
 
 ## Próximas etapas
 
-- adicionar uma API JSON pública para consultas externas;
 - ampliar a cobertura de testes.
 
 ## Autor
