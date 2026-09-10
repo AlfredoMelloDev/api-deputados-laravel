@@ -75,4 +75,17 @@ class DeputyApiTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['uf', 'por_pagina']);
     }
+
+    public function test_it_serves_the_human_and_openapi_documentation(): void
+    {
+        $this->get('/api/documentacao')
+            ->assertOk()
+            ->assertSee('Documentação da API')
+            ->assertSee('/api/v1/deputados');
+
+        $this->get('/openapi.yaml')
+            ->assertOk()
+            ->assertSee('openapi: 3.0.3')
+            ->assertSee('/deputados/{idDaCamara}/despesas');
+    }
 }

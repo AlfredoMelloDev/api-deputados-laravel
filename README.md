@@ -166,6 +166,9 @@ docker compose exec app vendor/bin/pint
 
 A API pública está disponível sob o prefixo `/api/v1`, retorna respostas paginadas e aceita até 60 requisições por minuto.
 
+- documentação visual: [http://localhost:8000/api/documentacao](http://localhost:8000/api/documentacao)
+- especificação OpenAPI: [http://localhost:8000/openapi.yaml](http://localhost:8000/openapi.yaml)
+
 ```text
 GET /api/v1/deputados
 GET /api/v1/deputados/{idDaCamara}

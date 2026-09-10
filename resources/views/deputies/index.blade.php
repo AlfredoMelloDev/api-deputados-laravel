@@ -13,6 +13,7 @@
         .eyebrow { color:var(--lime); font-size:12px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
         h1 { max-width:750px; margin:12px 0 10px; font-family:Georgia, serif; font-size:clamp(36px, 6vw, 68px); line-height:.98; font-weight:500; }
         header p { max-width:620px; margin:0; color:#d7e3dc; line-height:1.6; }
+        .api-link { display:inline-block; margin-top:18px; padding:9px 13px; border:1px solid #ffffff55; border-radius:9px; color:white; font-size:13px; font-weight:700; text-decoration:none; }
         .filters { position:relative; margin-top:-38px; padding:18px; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 14px 40px #1a33231a; display:grid; grid-template-columns:minmax(260px,2fr) minmax(150px,1fr) minmax(150px,1fr) minmax(125px,.75fr) auto; gap:12px; }
         input, select, button, .clear { min-height:48px; border-radius:10px; font:inherit; }
         input, select { width:100%; padding:0 14px; background:white; border:1px solid var(--line); color:var(--ink); }
@@ -85,6 +86,7 @@
         <div class="eyebrow">Câmara dos Deputados · Dados Abertos</div>
         <h1>Deputados em Dados</h1>
         <p>Consulte representantes, partidos, estados e despesas parlamentares em uma visão simples e transparente.</p>
+        <a class="api-link" href="{{ route('api.docs') }}">Documentação da API →</a>
     </div>
 </header>
 <main class="wrap">

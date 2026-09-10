@@ -1,0 +1,172 @@
+openapi: 3.0.3
+info:
+  title: Deputados em Dados API
+  version: 1.0.0
+  description: API pública para consulta de deputados federais e despesas parlamentares importadas da Câmara dos Deputados.
+servers:
+  - url: /api/v1
+paths:
+  /deputados:
+    get:
+      summary: Lista e pesquisa deputados
+      tags: [Deputados]
+      parameters:
+        - { name: nome, in: query, schema: { type: string, maxLength: 100 } }
+        - { name: partido, in: query, schema: { type: string, maxLength: 20 } }
+        - { name: uf, in: query, schema: { type: string, minLength: 2, maxLength: 2 }, example: SP }
+        - { name: ano_despesas, in: query, schema: { type: integer, minimum: 2008 }, example: 2025 }
+        - { $ref: '#/components/parameters/PerPage' }
+      responses:
+        '200':
+          description: Lista paginada de deputados
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DeputyCollection' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+  /deputados/{idDaCamara}:
+    get:
+      summary: Consulta um deputado pelo ID oficial da Câmara
+      tags: [Deputados]
+      parameters:
+        - $ref: '#/components/parameters/DeputyId'
+      responses:
+        '200':
+          description: Deputado encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Deputy' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+  /deputados/{idDaCamara}/despesas:
+    get:
+      summary: Lista as despesas de um deputado
+      tags: [Despesas]
+      parameters:
+        - $ref: '#/components/parameters/DeputyId'
+        - { name: ano, in: query, schema: { type: integer, minimum: 2008 }, example: 2025 }
+        - { name: mes, in: query, schema: { type: integer, minimum: 1, maximum: 12 }, example: 3 }
+        - { name: tipo, in: query, schema: { type: string, maxLength: 255 } }
+        - { name: fornecedor, in: query, schema: { type: string, maxLength: 150 } }
+        - { name: data_inicial, in: query, schema: { type: string, format: date } }
+        - { name: data_final, in: query, schema: { type: string, format: date } }
+        - { $ref: '#/components/parameters/PerPage' }
+      responses:
+        '200':
+          description: Lista paginada de despesas
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExpenseCollection' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+components:
+  parameters:
+    DeputyId:
+      name: idDaCamara
+      in: path
+      required: true
+      description: Identificador oficial do deputado na API da Câmara.
+      schema: { type: integer }
+      example: 74646
+    PerPage:
+      name: por_pagina
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+  responses:
+    NotFound:
+      description: Recurso não encontrado
+    TooManyRequests:
+      description: Limite de requisições excedido
+    ValidationError:
+      description: Parâmetros inválidos
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message: { type: string }
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items: { type: string }
+  schemas:
+    Deputy:
+      type: object
+      required: [id, nome, despesas, links]
+      properties:
+        id: { type: integer, example: 74646 }
+        nome: { type: string, example: Aécio Neves }
+        partido: { type: string, nullable: true, example: PSDB }
+        uf: { type: string, nullable: true, example: MG }
+        legislatura: { type: integer, nullable: true, example: 57 }
+        email: { type: string, format: email, nullable: true }
+        foto: { type: string, format: uri, nullable: true }
+        despesas:
+          type: object
+          properties:
+            quantidade: { type: integer, example: 98 }
+            valor_liquido: { type: number, format: double, example: 250000.75 }
+        sincronizado_em: { type: string, format: date-time, nullable: true }
+        links:
+          type: object
+          properties:
+            detalhes: { type: string, format: uri }
+            despesas: { type: string, format: uri }
+    Expense:
+      type: object
+      properties:
+        ano: { type: integer, example: 2025 }
+        mes: { type: integer, example: 3 }
+        tipo: { type: string }
+        data_documento: { type: string, format: date, nullable: true }
+        numero_documento: { type: string, nullable: true }
+        fornecedor:
+          type: object
+          properties:
+            nome: { type: string }
+            cnpj_cpf: { type: string, nullable: true }
+        valores:
+          type: object
+          properties:
+            documento: { type: number, format: double }
+            liquido: { type: number, format: double }
+            glosa: { type: number, format: double }
+        url_documento: { type: string, format: uri, nullable: true }
+    PaginationLinks:
+      type: object
+      properties:
+        first: { type: string, nullable: true }
+        last: { type: string, nullable: true }
+        prev: { type: string, nullable: true }
+        next: { type: string, nullable: true }
+    PaginationMeta:
+      type: object
+      properties:
+        current_page: { type: integer }
+        from: { type: integer, nullable: true }
+        last_page: { type: integer }
+        path: { type: string }
+        per_page: { type: integer }
+        to: { type: integer, nullable: true }
+        total: { type: integer }
+    DeputyCollection:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/Deputy' }
+        links: { $ref: '#/components/schemas/PaginationLinks' }
+        meta: { $ref: '#/components/schemas/PaginationMeta' }
+    ExpenseCollection:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/Expense' }
+        links: { $ref: '#/components/schemas/PaginationLinks' }
+        meta: { $ref: '#/components/schemas/PaginationMeta' }
