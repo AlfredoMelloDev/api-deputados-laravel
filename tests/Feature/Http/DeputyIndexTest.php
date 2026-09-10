@@ -82,4 +82,46 @@ class DeputyIndexTest extends TestCase
             ->assertSee('A última sincronização apresentou falhas')
             ->assertSee('API indisponível');
     }
+
+    public function test_it_warns_when_the_selected_year_is_still_being_synchronized(): void
+    {
+        Expense::factory()->create(['year' => 2026]);
+        SyncRun::query()->create([
+            'year' => 2026,
+            'status' => 'processing',
+            'total_deputies' => 513,
+            'processed_deputies' => 120,
+            'successful_jobs' => 120,
+            'expenses_received' => 8500,
+            'started_at' => now(),
+        ]);
+
+        $this->get('/?expense_year=2026')
+            ->assertOk()
+            ->assertSee('Dados de 2026 em atualização')
+            ->assertSee('Os indicadores são parciais')
+            ->assertSee('120/513 deputados');
+    }
+
+    public function test_it_confirms_when_the_selected_year_was_fully_synchronized(): void
+    {
+        Expense::factory()->create(['year' => 2026]);
+        SyncRun::query()->create([
+            'year' => 2026,
+            'status' => 'completed',
+            'total_deputies' => 513,
+            'processed_deputies' => 513,
+            'successful_jobs' => 513,
+            'expenses_received' => 43211,
+            'started_at' => now()->subMinute(),
+            'finished_at' => now(),
+        ]);
+
+        $this->get('/?expense_year=2026')
+            ->assertOk()
+            ->assertSee('Importação de 2026 concluída')
+            ->assertSee('Todos os 513 deputados foram processados')
+            ->assertSee('Dados sincronizados')
+            ->assertDontSee('Os indicadores são parciais');
+    }
 }

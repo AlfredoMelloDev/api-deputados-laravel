@@ -25,6 +25,10 @@ class DeputyController extends Controller
         $availableYears = Expense::query()->distinct()->orderByDesc('year')->pluck('year');
         $analyticsYear = (int) ($filters['expense_year'] ?? ($availableYears->contains(2025) ? 2025 : ($availableYears->first() ?? now()->year)));
         $yearExpenses = Expense::query()->where('year', $analyticsYear);
+        $analyticsSyncRun = SyncRun::query()
+            ->where('year', $analyticsYear)
+            ->latest('started_at')
+            ->first();
 
         $analytics = [
             'count' => (clone $yearExpenses)->count(),
@@ -79,6 +83,7 @@ class DeputyController extends Controller
             'topExpenseTypes' => $topExpenseTypes,
             'monthlyExpenses' => $monthlyExpenses,
             'topDeputies' => $topDeputies,
+            'analyticsSyncRun' => $analyticsSyncRun,
             'syncRuns' => SyncRun::query()->latest('started_at')->limit(5)->get(),
         ]);
     }

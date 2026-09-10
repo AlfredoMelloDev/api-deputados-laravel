@@ -40,6 +40,12 @@
         .analytics-head { display:flex; justify-content:space-between; align-items:end; margin:38px 2px 16px; }
         .analytics-head h2 { margin:0; font:500 30px Georgia, serif; }
         .analytics-head p { margin:5px 0 0; color:var(--muted); }
+        .sync-notice { display:flex; justify-content:space-between; align-items:center; gap:18px; margin-bottom:16px; padding:14px 16px; border:1px solid #d8c982; border-radius:14px; background:#fff9db; color:#594c13; }
+        .sync-notice strong, .sync-notice small { display:block; }
+        .sync-notice small { margin-top:3px; color:#75671f; }
+        .sync-notice.complete { border-color:#b9d5c6; background:#eef8f2; color:#174b35; }
+        .sync-notice.error { border-color:#e1b9ae; background:#fff4f0; color:#762d1d; }
+        .sync-badge { flex:0 0 auto; padding:7px 10px; border-radius:99px; background:#ffffffa6; font-size:12px; font-weight:800; white-space:nowrap; }
         .analytics { display:grid; grid-template-columns:repeat(3,1fr) 2fr; gap:14px; }
         .metric, .ranking { padding:20px; background:var(--card); border:1px solid var(--line); border-radius:16px; }
         .metric span { color:var(--muted); font-size:12px; }
@@ -98,6 +104,27 @@
         <button type="submit">Filtrar</button>
     </form>
     <section class="analytics-head"><div><h2>Visão geral de {{ $analyticsYear }}</h2><p>Indicadores atualizados a partir dos dados importados.</p></div></section>
+    @if($analyticsSyncRun?->status === 'processing')
+        <aside class="sync-notice" role="status">
+            <div><strong>Dados de {{ $analyticsYear }} em atualização</strong><small>Os indicadores são parciais enquanto as despesas dos deputados são importadas.</small></div>
+            <span class="sync-badge">{{ $analyticsSyncRun->processed_deputies }}/{{ $analyticsSyncRun->total_deputies }} deputados</span>
+        </aside>
+    @elseif(in_array($analyticsSyncRun?->status, ['failed', 'completed_with_errors'], true))
+        <aside class="sync-notice error" role="alert">
+            <div><strong>Importação de {{ $analyticsYear }} concluída com pendências</strong><small>{{ $analyticsSyncRun->failed_jobs }} {{ $analyticsSyncRun->failed_jobs === 1 ? 'deputado não foi processado' : 'deputados não foram processados' }}. Os indicadores podem estar incompletos.</small></div>
+            <span class="sync-badge">Dados parciais</span>
+        </aside>
+    @elseif($analyticsSyncRun?->status === 'completed')
+        <aside class="sync-notice complete" role="status">
+            <div><strong>Importação de {{ $analyticsYear }} concluída</strong><small>Todos os {{ $analyticsSyncRun->total_deputies }} deputados foram processados pela última sincronização.</small></div>
+            <span class="sync-badge">Dados sincronizados</span>
+        </aside>
+    @elseif($analytics['count'] > 0)
+        <aside class="sync-notice" role="status">
+            <div><strong>Cobertura de {{ $analyticsYear }} não verificada</strong><small>Existem despesas importadas, mas não há uma sincronização completa registrada para este ano.</small></div>
+            <span class="sync-badge">Verificação pendente</span>
+        </aside>
+    @endif
     <section class="analytics">
         <div class="metric"><span>Valor líquido</span><strong>R$ {{ number_format($analytics['total'], 2, ',', '.') }}</strong></div>
         <div class="metric"><span>Despesas registradas</span><strong>{{ number_format($analytics['count'], 0, ',', '.') }}</strong></div>
