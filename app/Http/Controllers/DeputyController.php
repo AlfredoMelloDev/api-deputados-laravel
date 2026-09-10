@@ -36,6 +36,23 @@ class DeputyController extends Controller
             ->limit(5)
             ->get();
 
+        $monthlyExpenses = (clone $yearExpenses)
+            ->selectRaw('month, SUM(net_value) as total')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->keyBy('month');
+
+        $topDeputies = Deputy::query()
+            ->join('expenses', 'expenses.deputy_id', '=', 'deputies.id')
+            ->where('expenses.year', $analyticsYear)
+            ->select(['deputies.id', 'deputies.name', 'deputies.party_acronym', 'deputies.state_acronym', 'deputies.photo_url'])
+            ->selectRaw('SUM(expenses.net_value) as total')
+            ->groupBy('deputies.id', 'deputies.name', 'deputies.party_acronym', 'deputies.state_acronym', 'deputies.photo_url')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
         $deputies = Deputy::query()
             ->withCount('expenses')
             ->withSum('expenses', 'net_value')
@@ -57,6 +74,8 @@ class DeputyController extends Controller
             'analyticsYear' => $analyticsYear,
             'analytics' => $analytics,
             'topExpenseTypes' => $topExpenseTypes,
+            'monthlyExpenses' => $monthlyExpenses,
+            'topDeputies' => $topDeputies,
             'syncRuns' => SyncRun::query()->latest('started_at')->limit(5)->get(),
         ]);
     }

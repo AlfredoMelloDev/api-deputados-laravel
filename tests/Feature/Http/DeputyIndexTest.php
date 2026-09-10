@@ -37,16 +37,21 @@ class DeputyIndexTest extends TestCase
 
     public function test_it_displays_analytics_for_the_selected_expense_year(): void
     {
-        $deputy = Deputy::factory()->create();
-        Expense::factory()->for($deputy)->create(['year' => 2025, 'expense_type' => 'PASSAGENS', 'net_value' => 1200.50]);
+        $deputy = Deputy::factory()->create(['name' => 'Deputada Principal']);
+        $otherDeputy = Deputy::factory()->create(['name' => 'Deputado Secundário']);
+        Expense::factory()->for($deputy)->create(['year' => 2025, 'month' => 2, 'expense_type' => 'PASSAGENS', 'net_value' => 1200.50]);
+        Expense::factory()->for($otherDeputy)->create(['year' => 2025, 'month' => 3, 'expense_type' => 'PASSAGENS', 'net_value' => 100]);
         Expense::factory()->for($deputy)->create(['year' => 2024, 'expense_type' => 'COMBUSTÍVEIS', 'net_value' => 300]);
 
         $this->get('/?expense_year=2025')
             ->assertOk()
             ->assertSee('Visão geral de 2025')
-            ->assertSee('R$ 1.200,50')
+            ->assertSee('R$ 1.300,50')
             ->assertSee('PASSAGENS')
-            ->assertDontSee('COMBUSTÍVEIS');
+            ->assertDontSee('COMBUSTÍVEIS')
+            ->assertSee('Evolução mensal de 2025')
+            ->assertSee('Deputados com maiores despesas')
+            ->assertSeeInOrder(['Deputada Principal', 'Deputado Secundário']);
     }
 
     public function test_it_displays_the_latest_synchronization_runs(): void

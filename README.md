@@ -46,6 +46,7 @@ A importação é idempotente. Executar a sincronização novamente atualiza os 
 - prevenção de Jobs e despesas duplicadas;
 - filtros preparados no banco por partido, UF, ano e mês;
 - painel com indicadores gerais e ranking de categorias;
+- gráfico de evolução mensal e ranking dos deputados com maiores despesas;
 - listagem pesquisável e página individual de cada deputado;
 - filtros de despesas por ano, mês, tipo, fornecedor e intervalo de datas;
 - histórico visual das sincronizações, com progresso, totais e falhas;
@@ -183,7 +184,7 @@ app/
 
 ## Próximas etapas
 
-- ampliar os gráficos e rankings;
+- permitir a exportação dos resultados filtrados;
 - ampliar a cobertura de testes.
 
 ## Autor

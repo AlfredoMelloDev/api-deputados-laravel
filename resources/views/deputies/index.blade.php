@@ -62,9 +62,21 @@
         .alert strong { display:block; margin-bottom:3px; }
         .alert p { margin:0; color:#8b4a3d; font-size:13px; }
         .run-error { display:block; margin-top:4px; color:#9b3d2b; }
+        .insights { display:grid; grid-template-columns:1.2fr 1fr; gap:14px; margin-top:16px; }
+        .insight { padding:20px; background:var(--card); border:1px solid var(--line); border-radius:16px; }
+        .insight h3 { margin:0 0 18px; font-size:16px; }
+        .month-chart { display:grid; grid-template-columns:repeat(12,1fr); align-items:end; gap:7px; height:190px; padding-top:10px; }
+        .month { display:flex; height:100%; flex-direction:column; justify-content:end; align-items:center; gap:6px; color:var(--muted); font-size:10px; }
+        .month i { width:100%; min-height:3px; border-radius:5px 5px 2px 2px; background:var(--green); }
+        .deputy-rank { display:grid; grid-template-columns:34px 1fr auto; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line); color:inherit; text-decoration:none; }
+        .deputy-rank:last-child { border-bottom:0; }
+        .deputy-rank img { width:34px; height:34px; border-radius:50%; object-fit:cover; object-position:top; background:#dce3dc; }
+        .deputy-rank strong, .deputy-rank small { display:block; }
+        .deputy-rank small { color:var(--muted); margin-top:2px; }
+        .deputy-rank > strong { color:var(--green); font-size:12px; white-space:nowrap; }
         @media (max-width:1100px) { .filters { grid-template-columns:2fr 1fr 1fr; } .filters button { grid-column:span 1; } }
-        @media (max-width:900px) { .filters { grid-template-columns:1fr 1fr; } .grid { grid-template-columns:repeat(2,1fr); } .analytics { grid-template-columns:repeat(3,1fr); } .ranking { grid-column:1/-1; } }
-        @media (max-width:600px) { header { padding-top:35px; } .filters, .grid, .analytics { grid-template-columns:1fr; } .ranking { grid-column:auto; } .summary { align-items:start; flex-direction:column; } article { min-height:190px; } .metric strong { font-size:24px; } }
+        @media (max-width:900px) { .filters { grid-template-columns:1fr 1fr; } .grid { grid-template-columns:repeat(2,1fr); } .analytics { grid-template-columns:repeat(3,1fr); } .ranking { grid-column:1/-1; } .insights { grid-template-columns:1fr; } }
+        @media (max-width:600px) { header { padding-top:35px; } .filters, .grid, .analytics { grid-template-columns:1fr; } .ranking { grid-column:auto; } .summary { align-items:start; flex-direction:column; } article { min-height:190px; } .metric strong { font-size:24px; } .month-chart { gap:3px; } }
     </style>
 </head>
 <body>
@@ -93,6 +105,26 @@
             @php($largestTypeTotal = (float) ($topExpenseTypes->max('total') ?? 0))
             @forelse($topExpenseTypes as $expenseType)
                 <div class="rank"><div class="rank-label"><span>{{ $expenseType->expense_type }}</span><strong>R$ {{ number_format((float) $expenseType->total, 2, ',', '.') }}</strong></div><div class="bar"><i style="width:{{ $largestTypeTotal > 0 ? ((float) $expenseType->total / $largestTypeTotal) * 100 : 0 }}%"></i></div></div>
+            @empty
+                <span class="location">Ainda não há despesas para este ano.</span>
+            @endforelse
+        </div>
+    </section>
+    <section class="insights">
+        <div class="insight">
+            <h3>Evolução mensal de {{ $analyticsYear }}</h3>
+            @php($largestMonthTotal = max(1, (float) ($monthlyExpenses->max('total') ?? 0)))
+            <div class="month-chart" aria-label="Gráfico mensal de despesas">
+                @foreach([1=>'Jan',2=>'Fev',3=>'Mar',4=>'Abr',5=>'Mai',6=>'Jun',7=>'Jul',8=>'Ago',9=>'Set',10=>'Out',11=>'Nov',12=>'Dez'] as $monthNumber => $monthName)
+                    @php($monthTotal = (float) ($monthlyExpenses->get($monthNumber)?->total ?? 0))
+                    <div class="month" title="{{ $monthName }}: R$ {{ number_format($monthTotal, 2, ',', '.') }}"><i style="height:{{ ($monthTotal / $largestMonthTotal) * 150 }}px"></i><span>{{ $monthName }}</span></div>
+                @endforeach
+            </div>
+        </div>
+        <div class="insight">
+            <h3>Deputados com maiores despesas</h3>
+            @forelse($topDeputies as $rankedDeputy)
+                <a class="deputy-rank" href="{{ route('deputies.show', $rankedDeputy->id) }}"><img src="{{ $rankedDeputy->photo_url }}" alt=""><span><strong>{{ $rankedDeputy->name }}</strong><small>{{ $rankedDeputy->party_acronym }} · {{ $rankedDeputy->state_acronym }}</small></span><strong>R$ {{ number_format((float) $rankedDeputy->total, 2, ',', '.') }}</strong></a>
             @empty
                 <span class="location">Ainda não há despesas para este ano.</span>
             @endforelse
