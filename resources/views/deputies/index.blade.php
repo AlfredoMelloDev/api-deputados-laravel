@@ -120,8 +120,9 @@
         .assistant-position { display:grid; width:27px; height:27px; place-items:center; border-radius:8px; background:#e8eee9; color:var(--green); font-size:9px; font-weight:850; }
         .assistant-item:first-child .assistant-position { background:var(--lime); color:#263a21; }
         .assistant-item strong,.assistant-item small { display:block; }
-        .assistant-item small { margin-top:2px; color:var(--muted); font-size:9px; }
-        .assistant-value { color:var(--green); font-size:10px; white-space:nowrap; }
+        .assistant-item-label { font-size:13px; line-height:1.28; }
+        .assistant-item small { margin-top:3px; color:var(--muted); font-size:10px; line-height:1.25; }
+        .assistant-value { color:var(--green); font-size:11px; line-height:1.2; white-space:nowrap; }
         .assistant-coverage { margin:12px 0 0; padding:8px 10px; border-radius:9px; background:#fff6d6; color:#75671f; font-size:9px; }
         .assistant-coverage.complete { background:#eef8f2; color:var(--green); }
         @keyframes assistant-in { from { opacity:0; transform:translateY(12px) scale(.98); } to { opacity:1; transform:none; } }
@@ -328,6 +329,7 @@
                     position.textContent = `${index + 1}º`;
                     const identity = document.createElement('span');
                     const label = document.createElement('strong');
+                    label.className = 'assistant-item-label';
                     label.textContent = item.label;
                     const detail = document.createElement('small');
                     detail.textContent = item.detail;
