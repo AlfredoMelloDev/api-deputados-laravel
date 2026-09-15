@@ -82,35 +82,52 @@
         .deputy-rank strong, .deputy-rank small { display:block; }
         .deputy-rank small { color:var(--muted); margin-top:2px; }
         .deputy-rank > strong { color:var(--green); font-size:12px; white-space:nowrap; }
-        .assistant-toggle { position:fixed; right:24px; bottom:24px; z-index:20; min-height:52px; padding:0 18px; border:1px solid #ffffff55; border-radius:99px; box-shadow:0 12px 30px #123b2b42; }
-        .assistant-panel { position:fixed; right:24px; bottom:88px; z-index:20; width:min(420px,calc(100vw - 32px)); max-height:min(650px,calc(100vh - 120px)); overflow:auto; padding:20px; border:1px solid var(--line); border-radius:18px; background:var(--card); box-shadow:0 20px 60px #17231d33; }
+        .assistant-toggle { position:fixed; right:24px; bottom:24px; z-index:20; display:flex; align-items:center; gap:11px; min-height:58px; padding:7px 18px 7px 8px; border:1px solid #ffffff38; border-radius:16px; background:#123e2d; box-shadow:0 16px 36px #123b2b3d; transition:transform .2s,box-shadow .2s; }
+        .assistant-toggle:hover { transform:translateY(-2px); box-shadow:0 20px 42px #123b2b52; }
+        .assistant-toggle-icon { display:grid; width:42px; height:42px; place-items:center; border-radius:11px; background:var(--lime); color:#123e2d; }
+        .assistant-toggle-icon svg { width:20px; height:20px; }
+        .assistant-toggle-copy { display:grid; gap:1px; text-align:left; }
+        .assistant-toggle-copy strong { font-size:13px; }
+        .assistant-toggle-copy small { color:#cfe0d7; font-size:10px; font-weight:500; }
+        .assistant-panel { position:fixed; right:24px; bottom:94px; z-index:20; width:min(470px,calc(100vw - 32px)); max-height:min(720px,calc(100vh - 120px)); overflow:auto; border:1px solid #ffffff6b; border-radius:22px; background:#f8f6ef; box-shadow:0 28px 80px #0c241a42; animation:assistant-in .22s ease-out; }
         .assistant-panel[hidden] { display:none; }
-        .assistant-head { display:flex; justify-content:space-between; align-items:start; gap:15px; }
-        .assistant-head h2 { margin:0; font:500 24px Georgia,serif; }
-        .assistant-head p { margin:5px 0 0; color:var(--muted); font-size:12px; line-height:1.45; }
-        .assistant-close { min-height:34px; padding:0 10px; background:transparent; color:var(--green); border:1px solid var(--line); }
-        .assistant-suggestions { display:flex; flex-wrap:wrap; gap:7px; margin:16px 0; }
-        .assistant-suggestion { min-height:34px; padding:6px 10px; border:1px solid #b9d5c6; background:#eef8f2; color:var(--green); font-size:11px; text-align:left; }
-        .assistant-form { display:grid; grid-template-columns:1fr auto; gap:8px; }
-        .assistant-form input { min-width:0; }
-        .assistant-form button { padding:0 15px; }
-        .assistant-result { margin-top:16px; padding-top:16px; border-top:1px solid var(--line); }
+        .assistant-head { position:relative; display:flex; justify-content:space-between; align-items:start; gap:15px; padding:22px 22px 20px; overflow:hidden; background:#123e2d; color:white; }
+        .assistant-head::after { content:""; position:absolute; right:-36px; bottom:-58px; width:170px; height:170px; border:1px solid #d9ef8b38; border-radius:50%; box-shadow:0 0 0 24px #d9ef8b0d,0 0 0 50px #d9ef8b09; }
+        .assistant-eyebrow { position:relative; z-index:1; display:flex; align-items:center; gap:7px; margin-bottom:8px; color:var(--lime); font-size:9px; font-weight:850; letter-spacing:.14em; text-transform:uppercase; }
+        .assistant-eyebrow i { width:6px; height:6px; border-radius:50%; background:var(--lime); box-shadow:0 0 0 4px #d9ef8b1f; }
+        .assistant-head h2 { position:relative; z-index:1; margin:0; font:500 25px Georgia,serif; }
+        .assistant-head p { position:relative; z-index:1; max-width:310px; margin:6px 0 0; color:#cfe0d7; font-size:11px; line-height:1.5; }
+        .assistant-close { position:relative; z-index:2; min-height:34px; padding:0 10px; border:1px solid #ffffff33; background:#ffffff0d; color:white; }
+        .assistant-body { padding:19px 20px 20px; }
+        .assistant-section-label { display:block; margin-bottom:9px; color:#718078; font-size:9px; font-weight:850; letter-spacing:.13em; text-transform:uppercase; }
+        .assistant-suggestions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:18px; }
+        .assistant-suggestion { display:grid; gap:3px; min-height:66px; padding:11px 12px; border:1px solid #d8ddd6; border-radius:12px; background:#fffdf8; color:var(--ink); font-size:11px; font-weight:650; line-height:1.3; text-align:left; transition:border-color .18s,transform .18s,background .18s; }
+        .assistant-suggestion:hover { transform:translateY(-1px); border-color:#9bb9a9; background:#f3f8f4; }
+        .assistant-suggestion span { color:var(--green); font-size:9px; font-weight:850; letter-spacing:.09em; text-transform:uppercase; }
+        .assistant-suggestion:last-child { grid-column:1/-1; min-height:52px; }
+        .assistant-form { display:grid; grid-template-columns:1fr auto; gap:8px; padding:6px; border:1px solid #bfc9c2; border-radius:14px; background:white; box-shadow:0 7px 20px #17231d0a; }
+        .assistant-form:focus-within { border-color:var(--green); box-shadow:0 0 0 3px #164b3512; }
+        .assistant-form input { min-width:0; min-height:42px; padding:0 10px; border:0; outline:0; background:transparent; font-size:12px; }
+        .assistant-form button { min-height:42px; padding:0 15px; border-radius:10px; font-size:11px; }
+        .assistant-result { margin-top:16px; padding:16px; border:1px solid #d8ddd6; border-radius:15px; background:#fffdf8; }
         .assistant-result[hidden] { display:none; }
-        .assistant-result h3 { margin:0 0 5px; font-size:15px; }
-        .assistant-answer { margin:0; color:var(--muted); font-size:13px; line-height:1.5; }
-        .assistant-items { display:grid; gap:0; margin-top:10px; }
-        .assistant-item { display:grid; grid-template-columns:24px 1fr auto; gap:8px; align-items:center; padding:9px 0; border-top:1px solid var(--line); color:inherit; text-decoration:none; }
-        .assistant-item:first-child { border-top:0; }
-        .assistant-position { color:var(--muted); font-size:11px; }
+        .assistant-query { display:inline-block; max-width:90%; margin:0 0 15px auto; padding:8px 11px; border-radius:11px 11px 3px 11px; background:#edf3ee; color:#456052; font-size:10px; }
+        .assistant-result h3 { margin:0 0 6px; font:500 18px Georgia,serif; }
+        .assistant-answer { margin:0; color:var(--muted); font-size:11px; line-height:1.55; }
+        .assistant-items { display:grid; gap:7px; margin-top:13px; counter-reset:ranking; }
+        .assistant-item { display:grid; grid-template-columns:28px 1fr auto; gap:9px; align-items:center; padding:10px; border:1px solid #e1e5df; border-radius:11px; background:#fbfaf5; color:inherit; text-decoration:none; transition:border-color .18s,background .18s; }
+        a.assistant-item:hover { border-color:#aac1b4; background:#f2f7f3; }
+        .assistant-position { display:grid; width:27px; height:27px; place-items:center; border-radius:8px; background:#e8eee9; color:var(--green); font-size:9px; font-weight:850; }
+        .assistant-item:first-child .assistant-position { background:var(--lime); color:#263a21; }
         .assistant-item strong,.assistant-item small { display:block; }
-        .assistant-item small { margin-top:2px; color:var(--muted); font-size:10px; }
-        .assistant-value { color:var(--green); font-size:11px; white-space:nowrap; }
-        .assistant-coverage { margin:12px 0 0; padding:8px 10px; border-radius:9px; background:#fff9db; color:#75671f; font-size:10px; }
+        .assistant-item small { margin-top:2px; color:var(--muted); font-size:9px; }
+        .assistant-value { color:var(--green); font-size:10px; white-space:nowrap; }
+        .assistant-coverage { margin:12px 0 0; padding:8px 10px; border-radius:9px; background:#fff6d6; color:#75671f; font-size:9px; }
         .assistant-coverage.complete { background:#eef8f2; color:var(--green); }
-        .assistant-loading { color:var(--muted); font-size:12px; }
+        @keyframes assistant-in { from { opacity:0; transform:translateY(12px) scale(.98); } to { opacity:1; transform:none; } }
         @media (max-width:1100px) { .filters { grid-template-columns:2fr 1fr 1fr; } .filters button { grid-column:span 1; } }
         @media (max-width:900px) { .filters { grid-template-columns:1fr 1fr; } .grid { grid-template-columns:repeat(2,1fr); } .analytics { grid-template-columns:repeat(3,1fr); } .ranking { grid-column:1/-1; } .insights { grid-template-columns:1fr; } }
-        @media (max-width:600px) { header { padding-top:35px; } .filters, .grid, .analytics { grid-template-columns:1fr; } .ranking { grid-column:auto; } .summary { align-items:start; flex-direction:column; } article { min-height:190px; } .metric strong { font-size:24px; } .month-chart { gap:3px; } }
+        @media (max-width:600px) { header { padding-top:35px; } .filters, .grid, .analytics { grid-template-columns:1fr; } .ranking { grid-column:auto; } .summary { align-items:start; flex-direction:column; } article { min-height:190px; } .metric strong { font-size:24px; } .month-chart { gap:3px; } .assistant-toggle { right:16px; bottom:16px; } .assistant-toggle-copy small { display:none; } .assistant-panel { right:8px; bottom:82px; width:calc(100vw - 16px); max-height:calc(100vh - 96px); border-radius:18px; } .assistant-suggestions { grid-template-columns:1fr; } .assistant-suggestion:last-child { grid-column:auto; } }
     </style>
 </head>
 <body>
@@ -236,22 +253,29 @@
         </nav>
     @endif
 </main>
-<button class="assistant-toggle" type="button" aria-expanded="false" aria-controls="expense-assistant">Pergunte aos dados</button>
+<button class="assistant-toggle" type="button" aria-expanded="false" aria-controls="expense-assistant">
+    <span class="assistant-toggle-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5.5h16M4 12h10M4 18.5h7"/><circle cx="18" cy="15.5" r="3"/><path d="m20.2 17.7 2 2"/></svg></span>
+    <span class="assistant-toggle-copy"><strong>Explorar os dados</strong><small>Consulte despesas em linguagem simples</small></span>
+</button>
 <aside class="assistant-panel" id="expense-assistant" aria-label="Assistente de despesas parlamentares" hidden>
-    <div class="assistant-head"><div><h2>Assistente dos dados</h2><p>Faça perguntas sobre as despesas importadas da Câmara.</p></div><button class="assistant-close" type="button" aria-label="Fechar assistente">×</button></div>
-    <div class="assistant-suggestions">
-        <button class="assistant-suggestion" type="button">Quem gastou mais com combustível?</button>
-        <button class="assistant-suggestion" type="button">Quem gastou mais com propaganda?</button>
-        <button class="assistant-suggestion" type="button">Quais são as maiores categorias?</button>
-        <button class="assistant-suggestion" type="button">Qual partido gastou mais?</button>
-        <button class="assistant-suggestion" type="button">Quais fornecedores receberam mais?</button>
-    </div>
-    <form class="assistant-form">
-        <input type="text" name="question" minlength="4" maxlength="300" placeholder="Ex.: Quem mais gastou com passagens?" required>
-        <button type="submit">Perguntar</button>
-    </form>
-    <div class="assistant-result" aria-live="polite" hidden>
-        <h3></h3><p class="assistant-answer"></p><div class="assistant-items"></div><p class="assistant-coverage"></p>
+    <div class="assistant-head"><div><div class="assistant-eyebrow"><i></i>Consulta aos dados oficiais</div><h2>O que você quer descobrir?</h2><p>Explore padrões nas despesas importadas da Câmara dos Deputados.</p></div><button class="assistant-close" type="button" aria-label="Fechar assistente">×</button></div>
+    <div class="assistant-body">
+        <span class="assistant-section-label">Comece por uma análise</span>
+        <div class="assistant-suggestions">
+            <button class="assistant-suggestion" type="button" data-question="Quem gastou mais com combustível?"><span>Categoria</span>Maior gasto com combustível</button>
+            <button class="assistant-suggestion" type="button" data-question="Quem gastou mais com propaganda?"><span>Divulgação</span>Maior gasto com propaganda</button>
+            <button class="assistant-suggestion" type="button" data-question="Quais são as maiores categorias?"><span>Visão geral</span>Ranking de categorias</button>
+            <button class="assistant-suggestion" type="button" data-question="Qual partido gastou mais?"><span>Partidos</span>Comparar despesas</button>
+            <button class="assistant-suggestion" type="button" data-question="Quais fornecedores receberam mais?"><span>Fornecedores</span>Quem recebeu os maiores valores</button>
+        </div>
+        <span class="assistant-section-label">Ou escreva sua pergunta</span>
+        <form class="assistant-form">
+            <input type="text" name="question" minlength="4" maxlength="300" placeholder="Ex.: Quem mais gastou com passagens?" aria-label="Pergunta sobre as despesas" required>
+            <button type="submit">Consultar</button>
+        </form>
+        <div class="assistant-result" aria-live="polite" hidden>
+            <p class="assistant-query"></p><h3></h3><p class="assistant-answer"></p><div class="assistant-items"></div><p class="assistant-coverage"></p>
+        </div>
     </div>
 </aside>
 <script>
@@ -262,6 +286,7 @@
         const form = document.querySelector('.assistant-form');
         const input = form.elements.question;
         const result = document.querySelector('.assistant-result');
+        const query = result.querySelector('.assistant-query');
         const title = result.querySelector('h3');
         const answer = result.querySelector('.assistant-answer');
         const items = result.querySelector('.assistant-items');
@@ -271,11 +296,12 @@
         const closePanel = () => { panel.hidden = true; toggle.setAttribute('aria-expanded', 'false'); };
         toggle.addEventListener('click', () => panel.hidden ? openPanel() : closePanel());
         close.addEventListener('click', closePanel);
-        document.querySelectorAll('.assistant-suggestion').forEach(button => button.addEventListener('click', () => { input.value = button.textContent.trim(); form.requestSubmit(); }));
+        document.querySelectorAll('.assistant-suggestion').forEach(button => button.addEventListener('click', () => { input.value = button.dataset.question; form.requestSubmit(); }));
 
         form.addEventListener('submit', async event => {
             event.preventDefault();
             result.hidden = false;
+            query.textContent = input.value;
             title.textContent = 'Consultando os dados…';
             answer.textContent = '';
             items.replaceChildren();
