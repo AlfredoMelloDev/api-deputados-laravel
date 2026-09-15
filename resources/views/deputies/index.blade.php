@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Deputados em Dados</title>
     <style>
         :root { color-scheme: light; --ink:#17231d; --muted:#647069; --paper:#f4f1e9; --card:#fffdf8; --green:#164b35; --lime:#d9ef8b; --line:#d8ddd6; }
@@ -81,6 +82,32 @@
         .deputy-rank strong, .deputy-rank small { display:block; }
         .deputy-rank small { color:var(--muted); margin-top:2px; }
         .deputy-rank > strong { color:var(--green); font-size:12px; white-space:nowrap; }
+        .assistant-toggle { position:fixed; right:24px; bottom:24px; z-index:20; min-height:52px; padding:0 18px; border:1px solid #ffffff55; border-radius:99px; box-shadow:0 12px 30px #123b2b42; }
+        .assistant-panel { position:fixed; right:24px; bottom:88px; z-index:20; width:min(420px,calc(100vw - 32px)); max-height:min(650px,calc(100vh - 120px)); overflow:auto; padding:20px; border:1px solid var(--line); border-radius:18px; background:var(--card); box-shadow:0 20px 60px #17231d33; }
+        .assistant-panel[hidden] { display:none; }
+        .assistant-head { display:flex; justify-content:space-between; align-items:start; gap:15px; }
+        .assistant-head h2 { margin:0; font:500 24px Georgia,serif; }
+        .assistant-head p { margin:5px 0 0; color:var(--muted); font-size:12px; line-height:1.45; }
+        .assistant-close { min-height:34px; padding:0 10px; background:transparent; color:var(--green); border:1px solid var(--line); }
+        .assistant-suggestions { display:flex; flex-wrap:wrap; gap:7px; margin:16px 0; }
+        .assistant-suggestion { min-height:34px; padding:6px 10px; border:1px solid #b9d5c6; background:#eef8f2; color:var(--green); font-size:11px; text-align:left; }
+        .assistant-form { display:grid; grid-template-columns:1fr auto; gap:8px; }
+        .assistant-form input { min-width:0; }
+        .assistant-form button { padding:0 15px; }
+        .assistant-result { margin-top:16px; padding-top:16px; border-top:1px solid var(--line); }
+        .assistant-result[hidden] { display:none; }
+        .assistant-result h3 { margin:0 0 5px; font-size:15px; }
+        .assistant-answer { margin:0; color:var(--muted); font-size:13px; line-height:1.5; }
+        .assistant-items { display:grid; gap:0; margin-top:10px; }
+        .assistant-item { display:grid; grid-template-columns:24px 1fr auto; gap:8px; align-items:center; padding:9px 0; border-top:1px solid var(--line); color:inherit; text-decoration:none; }
+        .assistant-item:first-child { border-top:0; }
+        .assistant-position { color:var(--muted); font-size:11px; }
+        .assistant-item strong,.assistant-item small { display:block; }
+        .assistant-item small { margin-top:2px; color:var(--muted); font-size:10px; }
+        .assistant-value { color:var(--green); font-size:11px; white-space:nowrap; }
+        .assistant-coverage { margin:12px 0 0; padding:8px 10px; border-radius:9px; background:#fff9db; color:#75671f; font-size:10px; }
+        .assistant-coverage.complete { background:#eef8f2; color:var(--green); }
+        .assistant-loading { color:var(--muted); font-size:12px; }
         @media (max-width:1100px) { .filters { grid-template-columns:2fr 1fr 1fr; } .filters button { grid-column:span 1; } }
         @media (max-width:900px) { .filters { grid-template-columns:1fr 1fr; } .grid { grid-template-columns:repeat(2,1fr); } .analytics { grid-template-columns:repeat(3,1fr); } .ranking { grid-column:1/-1; } .insights { grid-template-columns:1fr; } }
         @media (max-width:600px) { header { padding-top:35px; } .filters, .grid, .analytics { grid-template-columns:1fr; } .ranking { grid-column:auto; } .summary { align-items:start; flex-direction:column; } article { min-height:190px; } .metric strong { font-size:24px; } .month-chart { gap:3px; } }
@@ -209,5 +236,90 @@
         </nav>
     @endif
 </main>
+<button class="assistant-toggle" type="button" aria-expanded="false" aria-controls="expense-assistant">Pergunte aos dados</button>
+<aside class="assistant-panel" id="expense-assistant" aria-label="Assistente de despesas parlamentares" hidden>
+    <div class="assistant-head"><div><h2>Assistente dos dados</h2><p>Faça perguntas sobre as despesas importadas da Câmara.</p></div><button class="assistant-close" type="button" aria-label="Fechar assistente">×</button></div>
+    <div class="assistant-suggestions">
+        <button class="assistant-suggestion" type="button">Quem gastou mais com combustível?</button>
+        <button class="assistant-suggestion" type="button">Quem gastou mais com propaganda?</button>
+        <button class="assistant-suggestion" type="button">Quais são as maiores categorias?</button>
+        <button class="assistant-suggestion" type="button">Qual partido gastou mais?</button>
+        <button class="assistant-suggestion" type="button">Quais fornecedores receberam mais?</button>
+    </div>
+    <form class="assistant-form">
+        <input type="text" name="question" minlength="4" maxlength="300" placeholder="Ex.: Quem mais gastou com passagens?" required>
+        <button type="submit">Perguntar</button>
+    </form>
+    <div class="assistant-result" aria-live="polite" hidden>
+        <h3></h3><p class="assistant-answer"></p><div class="assistant-items"></div><p class="assistant-coverage"></p>
+    </div>
+</aside>
+<script>
+    (() => {
+        const toggle = document.querySelector('.assistant-toggle');
+        const panel = document.querySelector('.assistant-panel');
+        const close = document.querySelector('.assistant-close');
+        const form = document.querySelector('.assistant-form');
+        const input = form.elements.question;
+        const result = document.querySelector('.assistant-result');
+        const title = result.querySelector('h3');
+        const answer = result.querySelector('.assistant-answer');
+        const items = result.querySelector('.assistant-items');
+        const coverage = result.querySelector('.assistant-coverage');
+
+        const openPanel = () => { panel.hidden = false; toggle.setAttribute('aria-expanded', 'true'); input.focus(); };
+        const closePanel = () => { panel.hidden = true; toggle.setAttribute('aria-expanded', 'false'); };
+        toggle.addEventListener('click', () => panel.hidden ? openPanel() : closePanel());
+        close.addEventListener('click', closePanel);
+        document.querySelectorAll('.assistant-suggestion').forEach(button => button.addEventListener('click', () => { input.value = button.textContent.trim(); form.requestSubmit(); }));
+
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            result.hidden = false;
+            title.textContent = 'Consultando os dados…';
+            answer.textContent = '';
+            items.replaceChildren();
+            coverage.textContent = '';
+            coverage.className = 'assistant-coverage';
+
+            try {
+                const response = await fetch(@json(route('assistant.ask')), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+                    body: JSON.stringify({ question: input.value, year: @json($analyticsYear) }),
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Não foi possível realizar a consulta.');
+
+                title.textContent = data.title;
+                answer.textContent = data.answer;
+                data.items.forEach((item, index) => {
+                    const row = document.createElement(item.url ? 'a' : 'div');
+                    row.className = 'assistant-item';
+                    if (item.url) row.href = item.url;
+                    const position = document.createElement('span');
+                    position.className = 'assistant-position';
+                    position.textContent = `${index + 1}º`;
+                    const identity = document.createElement('span');
+                    const label = document.createElement('strong');
+                    label.textContent = item.label;
+                    const detail = document.createElement('small');
+                    detail.textContent = item.detail;
+                    identity.append(label, detail);
+                    const value = document.createElement('strong');
+                    value.className = 'assistant-value';
+                    value.textContent = item.value;
+                    row.append(position, identity, value);
+                    items.append(row);
+                });
+                coverage.textContent = data.coverage.message;
+                coverage.classList.toggle('complete', data.coverage.status === 'complete');
+            } catch (error) {
+                title.textContent = 'Não consegui responder';
+                answer.textContent = error.message;
+            }
+        });
+    })();
+</script>
 </body>
 </html>
