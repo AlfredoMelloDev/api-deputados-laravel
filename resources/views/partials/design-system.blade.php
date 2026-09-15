@@ -26,7 +26,7 @@
     .dashboard .filters { margin-top:-48px; padding:10px; border-color:#c6cec8; border-radius:15px; box-shadow:0 18px 55px #18302417; }
     .dashboard .filters input,.dashboard .filters select { min-height:54px; border:0; border-right:1px solid var(--line); border-radius:7px; background:transparent; font-size:12px; }
     .dashboard .filters button { min-height:54px; border-radius:10px; }
-    .dashboard .analytics-head { padding-top:54px; }
+    .dashboard .analytics-head { margin:0 2px 16px; padding:38px 2px 0; }
     .dashboard .analytics-head h2,.dashboard .summary h2 { font-size:35px; letter-spacing:-.02em; }
     .dashboard .analytics { grid-template-columns:minmax(0,3fr) minmax(380px,2fr); grid-template-rows:repeat(3,minmax(86px,auto)); gap:0; overflow:hidden; border:1px solid var(--line); border-radius:18px; background:var(--card); }
     .dashboard .metric,.dashboard .ranking { min-height:0; border:0; border-radius:0; background:transparent; }
