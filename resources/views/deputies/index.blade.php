@@ -74,9 +74,18 @@
         .insights { display:grid; grid-template-columns:1.2fr 1fr; gap:14px; margin-top:16px; }
         .insight { padding:20px; background:var(--card); border:1px solid var(--line); border-radius:16px; }
         .insight h3 { margin:0 0 18px; font-size:16px; }
-        .month-chart { display:grid; grid-template-columns:repeat(12,1fr); align-items:end; gap:7px; height:190px; padding-top:10px; }
+        .insight-chart-head { display:flex; justify-content:space-between; align-items:start; gap:20px; }
+        .insight-chart-head h3 { margin:0; }
+        .insight-total { text-align:right; }
+        .insight-total span,.insight-total strong { display:block; }
+        .insight-total span { color:var(--muted); font-size:9px; font-weight:750; letter-spacing:.08em; text-transform:uppercase; }
+        .insight-total strong { margin-top:3px; color:var(--green); font:500 18px Georgia,serif; }
+        .month-chart { display:grid; grid-template-columns:repeat(12,1fr); align-items:end; gap:7px; height:210px; margin-top:12px; padding-top:10px; border-bottom:1px solid var(--line); background:linear-gradient(to bottom,transparent 24%,#d8ddd650 25%,transparent 26%,transparent 49%,#d8ddd650 50%,transparent 51%,transparent 74%,#d8ddd650 75%,transparent 76%); }
         .month { display:flex; height:100%; flex-direction:column; justify-content:end; align-items:center; gap:6px; color:var(--muted); font-size:10px; }
         .month i { width:100%; min-height:3px; border-radius:5px 5px 2px 2px; background:var(--green); }
+        .month-value { min-height:11px; color:#4e6257; font-size:8px; font-weight:750; white-space:nowrap; }
+        .chart-foot { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-top:12px; color:var(--muted); font-size:10px; }
+        .chart-foot strong { color:var(--green); }
         .deputy-rank { display:grid; grid-template-columns:34px 1fr auto; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line); color:inherit; text-decoration:none; }
         .deputy-rank:last-child { border-bottom:0; }
         .deputy-rank img { width:34px; height:34px; border-radius:50%; object-fit:cover; object-position:top; background:#dce3dc; }
@@ -192,14 +201,19 @@
     </section>
     <section class="insights">
         <div class="insight">
-            <h3>Evolução mensal de {{ $analyticsYear }}</h3>
+            @php($monthNames = [1=>'Jan',2=>'Fev',3=>'Mar',4=>'Abr',5=>'Mai',6=>'Jun',7=>'Jul',8=>'Ago',9=>'Set',10=>'Out',11=>'Nov',12=>'Dez'])
+            @php($largestMonthNumber = $monthlyExpenses->sortByDesc('total')->keys()->first())
+            @php($largestMonthValue = (float) ($monthlyExpenses->get($largestMonthNumber)?->total ?? 0))
+            <div class="insight-chart-head"><h3>Evolução mensal de {{ $analyticsYear }}</h3><div class="insight-total"><span>Total no ano</span><strong>R$ {{ number_format($analytics['total'], 2, ',', '.') }}</strong></div></div>
             @php($largestMonthTotal = max(1, (float) ($monthlyExpenses->max('total') ?? 0)))
             <div class="month-chart" aria-label="Gráfico mensal de despesas">
-                @foreach([1=>'Jan',2=>'Fev',3=>'Mar',4=>'Abr',5=>'Mai',6=>'Jun',7=>'Jul',8=>'Ago',9=>'Set',10=>'Out',11=>'Nov',12=>'Dez'] as $monthNumber => $monthName)
+                @foreach($monthNames as $monthNumber => $monthName)
                     @php($monthTotal = (float) ($monthlyExpenses->get($monthNumber)?->total ?? 0))
-                    <div class="month" title="{{ $monthName }}: R$ {{ number_format($monthTotal, 2, ',', '.') }}"><i style="height:{{ ($monthTotal / $largestMonthTotal) * 150 }}px"></i><span>{{ $monthName }}</span></div>
+                    @php($monthCompact = $monthTotal >= 1000000 ? 'R$ '.number_format($monthTotal / 1000000, 1, ',', '.').' mi' : ($monthTotal >= 1000 ? 'R$ '.number_format($monthTotal / 1000, 0, ',', '.').' mil' : 'R$ '.number_format($monthTotal, 0, ',', '.')))
+                    <div class="month" title="{{ $monthName }}: R$ {{ number_format($monthTotal, 2, ',', '.') }}"><span class="month-value">{{ $monthCompact }}</span><i style="height:{{ ($monthTotal / $largestMonthTotal) * 150 }}px"></i><span>{{ $monthName }}</span></div>
                 @endforeach
             </div>
+            <div class="chart-foot"><span>Barras proporcionais ao maior mês do período</span>@if($largestMonthNumber)<span>Pico: <strong>{{ $monthNames[$largestMonthNumber] }} · R$ {{ number_format($largestMonthValue, 2, ',', '.') }}</strong></span>@endif</div>
         </div>
         <div class="insight">
             <h3>Deputados com maiores despesas</h3>

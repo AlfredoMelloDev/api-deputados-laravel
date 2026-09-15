@@ -50,6 +50,9 @@ class DeputyIndexTest extends TestCase
             ->assertSee('PASSAGENS')
             ->assertDontSee('COMBUSTÍVEIS')
             ->assertSee('Evolução mensal de 2025')
+            ->assertSee('Total no ano')
+            ->assertSee('Pico:')
+            ->assertSee('Fev · R$ 1.200,50')
             ->assertSee('Deputados com maiores despesas')
             ->assertSeeInOrder(['Deputada Principal', 'Deputado Secundário']);
     }
