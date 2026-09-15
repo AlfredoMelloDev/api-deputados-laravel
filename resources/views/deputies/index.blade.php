@@ -130,14 +130,19 @@
         @media (max-width:900px) { .filters { grid-template-columns:1fr 1fr; } .grid { grid-template-columns:repeat(2,1fr); } .analytics { grid-template-columns:repeat(3,1fr); } .ranking { grid-column:1/-1; } .insights { grid-template-columns:1fr; } }
         @media (max-width:600px) { header { padding-top:35px; } .filters, .grid, .analytics { grid-template-columns:1fr; } .ranking { grid-column:auto; } .summary { align-items:start; flex-direction:column; } article { min-height:190px; } .metric strong { font-size:24px; } .month-chart { gap:3px; } .assistant-toggle { right:16px; bottom:16px; } .assistant-toggle-copy small { display:none; } .assistant-panel { right:8px; bottom:82px; width:calc(100vw - 16px); max-height:calc(100vh - 96px); border-radius:18px; } .assistant-suggestions { grid-template-columns:1fr; } .assistant-suggestion:last-child { grid-column:auto; } }
     </style>
+    @include('partials.design-system')
 </head>
-<body>
+<body class="dashboard">
 <header>
     <div class="wrap">
-        <div class="eyebrow">Câmara dos Deputados · Dados Abertos</div>
-        <h1>Deputados em Dados</h1>
-        <p>Consulte representantes, partidos, estados e despesas parlamentares em uma visão simples e transparente.</p>
-        <a class="api-link" href="{{ route('api.docs') }}">Documentação da API →</a>
+        <div class="site-topbar">
+            <a class="site-brand" href="{{ route('deputies.index') }}"><span class="site-brand-mark">D/D</span><span class="site-brand-copy"><strong>Deputados em Dados</strong><small>Observatório de despesas públicas</small></span></a>
+            <nav class="site-nav" aria-label="Navegação principal"><a class="active" href="{{ route('deputies.index') }}">Painel</a><a class="outline" href="{{ route('api.docs') }}">API pública ↗</a></nav>
+        </div>
+        <div class="hero-grid">
+            <div><div class="eyebrow">Câmara dos Deputados · Dados Abertos</div><h1>O dinheiro público, em perspectiva.</h1><p>Explore representantes, partidos, estados e despesas parlamentares em uma leitura clara, verificável e atualizada.</p></div>
+            <aside class="hero-aside"><span>Recorte em exibição</span><strong>{{ $analyticsYear }}</strong><small>{{ number_format($analytics['count'], 0, ',', '.') }} despesas importadas<br>{{ number_format($analytics['deputies'], 0, ',', '.') }} deputados com gastos</small></aside>
+        </div>
     </div>
 </header>
 <main class="wrap">
@@ -171,9 +176,9 @@
         </aside>
     @endif
     <section class="analytics">
-        <div class="metric"><span>Valor líquido</span><strong>R$ {{ number_format($analytics['total'], 2, ',', '.') }}</strong></div>
-        <div class="metric"><span>Despesas registradas</span><strong>{{ number_format($analytics['count'], 0, ',', '.') }}</strong></div>
-        <div class="metric"><span>Deputados com gastos</span><strong>{{ number_format($analytics['deputies'], 0, ',', '.') }}</strong></div>
+        <div class="metric"><i class="metric-index">01</i><span>Valor líquido</span><strong>R$ {{ number_format($analytics['total'], 2, ',', '.') }}</strong></div>
+        <div class="metric"><i class="metric-index">02</i><span>Despesas registradas</span><strong>{{ number_format($analytics['count'], 0, ',', '.') }}</strong></div>
+        <div class="metric"><i class="metric-index">03</i><span>Deputados com gastos</span><strong>{{ number_format($analytics['deputies'], 0, ',', '.') }}</strong></div>
         <div class="ranking">
             <h3>Maiores categorias de despesa</h3>
             @php($largestTypeTotal = (float) ($topExpenseTypes->max('total') ?? 0))

@@ -48,11 +48,12 @@
         @media(max-width:1000px) { form { grid-template-columns:repeat(2,1fr); } .supplier { grid-column:span 2; } }
         @media(max-width:700px) { .profile { align-items:flex-start; } .profile img { width:105px; height:130px; } form { grid-template-columns:1fr; } .supplier { grid-column:auto; } .section-head { align-items:start; flex-direction:column; } }
     </style>
+    @include('partials.design-system')
 </head>
-<body>
+<body class="deputy-page">
 <header>
     <div class="wrap">
-        <a class="back" href="{{ route('deputies.index') }}">← Voltar para todos os deputados</a>
+        <div class="site-topbar"><a class="site-brand" href="{{ route('deputies.index') }}"><span class="site-brand-mark">D/D</span><span class="site-brand-copy"><strong>Deputados em Dados</strong><small>Observatório de despesas públicas</small></span></a><nav class="site-nav"><a class="back" href="{{ route('deputies.index') }}">← Voltar ao painel</a><a class="outline" href="{{ route('api.docs') }}">API pública ↗</a></nav></div>
         <div class="profile">
             <img src="{{ $deputy->photo_url }}" alt="Foto de {{ $deputy->name }}">
             <div><span class="tag">{{ $deputy->party_acronym ?: 'Sem partido' }}</span><h1>{{ $deputy->name }}</h1><div class="meta">{{ $deputy->state_acronym }} · Legislatura {{ $deputy->legislature_id }} · ID {{ $deputy->camara_id }}</div></div>

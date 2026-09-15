@@ -28,16 +28,18 @@
         pre { overflow:auto; padding:16px; border-radius:10px; background:#102d21; color:#e5f1e9; font-size:12px; line-height:1.55; }
         .note { margin-top:30px; padding:18px; border-left:4px solid var(--green); background:var(--card); color:var(--muted); }
     </style>
+    @include('partials.design-system')
 </head>
-<body>
-<header><div class="wrap"><div class="eyebrow">Deputados em Dados · API v1</div><h1>Documentação da API</h1><p>Consulte deputados e despesas parlamentares em JSON, com filtros, paginação e identificadores oficiais da Câmara.</p><nav><a href="{{ route('deputies.index') }}">← Voltar ao painel</a><a href="{{ route('api.openapi') }}">OpenAPI YAML</a></nav></div></header>
+<body class="docs-page">
+<header><div class="wrap"><div class="site-topbar"><a class="site-brand" href="{{ route('deputies.index') }}"><span class="site-brand-mark">D/D</span><span class="site-brand-copy"><strong>Deputados em Dados</strong><small>Observatório de despesas públicas</small></span></a><nav class="site-nav"><a href="{{ route('deputies.index') }}">Painel</a><a class="active" href="{{ route('api.docs') }}">Documentação</a><a class="outline" href="{{ route('api.openapi') }}">OpenAPI ↗</a></nav></div><div class="eyebrow">API pública · Versão 1</div><h1>Dados abertos para construir.</h1><p>Consulte deputados e despesas parlamentares em JSON, com filtros, paginação e identificadores oficiais da Câmara.</p></div></header>
 <main class="wrap">
-    <p class="intro">A URL base é <code>{{ url('/api/v1') }}</code>. As respostas paginadas possuem as propriedades <code>data</code>, <code>links</code> e <code>meta</code>. O limite é de 60 requisições por minuto e 100 itens por página.</p>
-    <h2>Endpoints</h2>
-    <section class="endpoint"><span class="method">GET</span><h3><code>/deputados</code></h3><p>Lista e pesquisa deputados, incluindo o resumo de despesas.</p><div class="params"><span>nome</span><span>partido</span><span>uf</span><span>ano_despesas</span><span>por_pagina</span></div><pre>GET {{ url('/api/v1/deputados?nome=Ana&partido=PT&uf=SP&ano_despesas=2025') }}</pre></section>
-    <section class="endpoint"><span class="method">GET</span><h3><code>/deputados/{idDaCamara}</code></h3><p>Retorna um deputado pelo identificador oficial da Câmara.</p><pre>GET {{ url('/api/v1/deputados/74646') }}</pre></section>
-    <section class="endpoint"><span class="method">GET</span><h3><code>/deputados/{idDaCamara}/despesas</code></h3><p>Lista as despesas do deputado com filtros combináveis.</p><div class="params"><span>ano</span><span>mes</span><span>tipo</span><span>fornecedor</span><span>data_inicial</span><span>data_final</span><span>por_pagina</span></div><pre>GET {{ url('/api/v1/deputados/74646/despesas?ano=2025&mes=3&fornecedor=Posto') }}</pre></section>
-    <div class="note"><strong>Erros</strong><br>Filtros inválidos retornam HTTP 422 com os campos incorretos. Deputados inexistentes retornam HTTP 404. Ao ultrapassar o limite de requisições, a API retorna HTTP 429.</div>
+    <aside class="docs-intro"><span class="section-kicker">Comece aqui</span><p class="intro">A URL base é <code>{{ url('/api/v1') }}</code>. As respostas paginadas possuem <code>data</code>, <code>links</code> e <code>meta</code>.<br><br>Limite de 60 requisições por minuto e 100 itens por página.</p></aside>
+    <div class="docs-content"><span class="section-kicker">Referência</span><h2>Endpoints</h2>
+        <section class="endpoint"><span class="method">GET</span><h3><code>/deputados</code></h3><p>Lista e pesquisa deputados, incluindo o resumo de despesas.</p><div class="params"><span>nome</span><span>partido</span><span>uf</span><span>ano_despesas</span><span>por_pagina</span></div><pre>GET {{ url('/api/v1/deputados?nome=Ana&partido=PT&uf=SP&ano_despesas=2025') }}</pre></section>
+        <section class="endpoint"><span class="method">GET</span><h3><code>/deputados/{idDaCamara}</code></h3><p>Retorna um deputado pelo identificador oficial da Câmara.</p><pre>GET {{ url('/api/v1/deputados/74646') }}</pre></section>
+        <section class="endpoint"><span class="method">GET</span><h3><code>/deputados/{idDaCamara}/despesas</code></h3><p>Lista as despesas do deputado com filtros combináveis.</p><div class="params"><span>ano</span><span>mes</span><span>tipo</span><span>fornecedor</span><span>data_inicial</span><span>data_final</span><span>por_pagina</span></div><pre>GET {{ url('/api/v1/deputados/74646/despesas?ano=2025&mes=3&fornecedor=Posto') }}</pre></section>
+        <div class="note"><strong>Erros</strong><br>Filtros inválidos retornam HTTP 422 com os campos incorretos. Deputados inexistentes retornam HTTP 404. Ao ultrapassar o limite de requisições, a API retorna HTTP 429.</div>
+    </div>
 </main>
 </body>
 </html>
