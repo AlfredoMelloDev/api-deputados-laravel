@@ -54,12 +54,15 @@
     .deputy-page .profile { position:relative; z-index:1; }
     .deputy-page .profile img { width:132px; height:154px; border:1px solid #ffffff52; border-radius:14px; filter:saturate(.82); }
     .deputy-page h1 { font-size:clamp(40px,5vw,68px); letter-spacing:-.035em; }
-    .deputy-page .stats { gap:0; overflow:hidden; border:1px solid var(--line); border-radius:17px; background:var(--card); box-shadow:0 18px 50px #18302412; }
-    .deputy-page .stat { min-height:128px; padding:25px; border:0; border-right:1px solid var(--line); border-radius:0; box-shadow:none; }
+    .deputy-page main { position:relative; z-index:2; }
+    .deputy-page .stats { position:relative; gap:0; overflow:hidden; border:1px solid var(--line); border-radius:17px; background:var(--card); box-shadow:0 18px 50px #18302412; }
+    .deputy-page .stat { display:grid; grid-template-columns:minmax(120px,1fr) minmax(170px,auto); min-height:128px; align-items:center; gap:18px; padding:25px; border:0; border-right:1px solid var(--line); border-radius:0; box-shadow:none; }
+    .deputy-page .stat strong { min-width:170px; margin:0; color:var(--green); font:500 27px/1 Georgia,serif; font-variant-numeric:lining-nums tabular-nums; letter-spacing:-.02em; text-align:right; white-space:nowrap; }
     .deputy-page .stat:last-child { border-right:0; }
     .deputy-page .section-head { margin-top:52px; }
     .deputy-page form { padding:10px; border-radius:15px; box-shadow:none; }
     .deputy-page form input,.deputy-page form select { border-color:transparent; border-right-color:var(--line); background:transparent; font-size:11px; }
+    .deputy-page form button { grid-column:1; justify-self:start; width:auto; min-width:140px; min-height:42px; margin-top:8px; padding:0 20px; border-radius:9px; }
     .deputy-page .table-box { border-radius:16px; }
     .deputy-page th { padding:14px 18px; background:#e9eee9; color:#53645b; font-size:9px; }
     .deputy-page td { padding:17px 18px; font-size:12px; }
@@ -90,6 +93,12 @@
         .dashboard .ranking { grid-column:1/-1; grid-row:auto; border-top:1px solid var(--line); }
         .docs-page main { grid-template-columns:1fr; }
         .docs-page .docs-intro { position:static; }
+    }
+    @media(max-width:760px) {
+        .deputy-page .stats { grid-template-columns:1fr; }
+        .deputy-page .stat { display:block; min-height:110px; border-right:0; border-bottom:1px solid var(--line); }
+        .deputy-page .stat:last-child { border-bottom:0; }
+        .deputy-page .stat strong { min-width:0; margin-top:12px; text-align:left; }
     }
     @media(max-width:600px) {
         .site-topbar { padding-bottom:26px; }
