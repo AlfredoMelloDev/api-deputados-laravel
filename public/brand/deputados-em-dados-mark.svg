@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Deputados em Dados</title>
+  <desc id="desc">Letra D formada pelo contorno de um plenário e por três barras de dados</desc>
+  <rect width="64" height="64" rx="16" fill="#0f3d2c"/>
+  <path d="M16 12h11c15.2 0 25 8.2 25 20s-9.8 20-25 20H16V12Z" fill="none" stroke="#d9ef8b" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M23 43v-9h5v9h-5Zm8 0V27h5v16h-5Zm8 0V20h5v23h-5Z" fill="#d9ef8b"/>
+  <path d="M21 46h25" fill="none" stroke="#d9ef8b" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+</svg>

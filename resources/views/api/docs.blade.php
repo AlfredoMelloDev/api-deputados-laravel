@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('brand/deputados-em-dados-mark.svg') }}">
     <title>Documentação da API · Deputados em Dados</title>
     <style>
         :root { --ink:#17231d; --muted:#647069; --paper:#f4f1e9; --card:#fffdf8; --green:#164b35; --lime:#d9ef8b; --line:#d8ddd6; }
@@ -31,7 +32,7 @@
     @include('partials.design-system')
 </head>
 <body class="docs-page">
-<header><div class="wrap"><div class="site-topbar"><a class="site-brand" href="{{ route('deputies.index') }}"><span class="site-brand-mark">D/D</span><span class="site-brand-copy"><strong>Deputados em Dados</strong><small>Observatório de despesas públicas</small></span></a><nav class="site-nav"><a href="{{ route('deputies.index') }}">Painel</a><a class="active" href="{{ route('api.docs') }}">Documentação</a><a class="outline" href="{{ route('api.openapi') }}">OpenAPI ↗</a></nav></div><div class="eyebrow">API pública · Versão 1</div><h1>Dados abertos para construir.</h1><p>Consulte deputados e despesas parlamentares em JSON, com filtros, paginação e identificadores oficiais da Câmara.</p></div></header>
+<header><div class="wrap"><div class="site-topbar">@include('partials.brand')<nav class="site-nav"><a href="{{ route('deputies.index') }}">Painel</a><a class="active" href="{{ route('api.docs') }}">Documentação</a><a class="outline" href="{{ route('api.openapi') }}">OpenAPI ↗</a></nav></div><div class="eyebrow">API pública · Versão 1</div><h1>Dados abertos para construir.</h1><p>Consulte deputados e despesas parlamentares em JSON, com filtros, paginação e identificadores oficiais da Câmara.</p></div></header>
 <main class="wrap">
     <aside class="docs-intro"><span class="section-kicker">Comece aqui</span><p class="intro">A URL base é <code>{{ url('/api/v1') }}</code>. As respostas paginadas possuem <code>data</code>, <code>links</code> e <code>meta</code>.<br><br>Limite de 60 requisições por minuto e 100 itens por página.</p></aside>
     <div class="docs-content"><span class="section-kicker">Referência</span><h2>Endpoints</h2>

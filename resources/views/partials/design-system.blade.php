@@ -3,7 +3,8 @@
     body { background-color:var(--canvas); background-image:radial-gradient(#173d2d12 0.7px,transparent 0.7px); background-size:18px 18px; }
     .site-topbar { position:relative; z-index:2; display:flex; justify-content:space-between; align-items:center; padding:0 0 34px; }
     .site-brand { display:flex; align-items:center; gap:10px; color:white; text-decoration:none; }
-    .site-brand-mark { display:grid; width:34px; height:34px; place-items:center; border:1px solid #ffffff42; border-radius:10px; color:var(--acid); font:800 11px/1 ui-monospace,monospace; }
+    .site-brand-mark { display:grid; width:38px; height:38px; place-items:center; border:1px solid #ffffff3b; border-radius:11px; background:#ffffff08; color:var(--acid); }
+    .site-brand-mark svg { width:29px; height:29px; }
     .site-brand-copy { display:grid; gap:1px; }
     .site-brand-copy strong { font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
     .site-brand-copy small { color:#bcd0c5; font-size:9px; }

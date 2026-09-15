@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('brand/deputados-em-dados-mark.svg') }}">
     <title>{{ $deputy->name }} · Deputados em Dados</title>
     <style>
         :root { --ink:#17231d; --muted:#647069; --paper:#f4f1e9; --card:#fffdf8; --green:#164b35; --lime:#d9ef8b; --line:#d8ddd6; }
@@ -53,7 +54,7 @@
 <body class="deputy-page">
 <header>
     <div class="wrap">
-        <div class="site-topbar"><a class="site-brand" href="{{ route('deputies.index') }}"><span class="site-brand-mark">D/D</span><span class="site-brand-copy"><strong>Deputados em Dados</strong><small>Observatório de despesas públicas</small></span></a><nav class="site-nav"><a class="back" href="{{ route('deputies.index') }}">← Voltar ao painel</a><a class="outline" href="{{ route('api.docs') }}">API pública ↗</a></nav></div>
+        <div class="site-topbar">@include('partials.brand')<nav class="site-nav"><a class="back" href="{{ route('deputies.index') }}">← Voltar ao painel</a><a class="outline" href="{{ route('api.docs') }}">API pública ↗</a></nav></div>
         <div class="profile">
             <img src="{{ $deputy->photo_url }}" alt="Foto de {{ $deputy->name }}">
             <div><span class="tag">{{ $deputy->party_acronym ?: 'Sem partido' }}</span><h1>{{ $deputy->name }}</h1><div class="meta">{{ $deputy->state_acronym }} · Legislatura {{ $deputy->legislature_id }} · ID {{ $deputy->camara_id }}</div></div>
