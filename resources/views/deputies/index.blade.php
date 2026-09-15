@@ -269,11 +269,11 @@
     <div class="assistant-body">
         <span class="assistant-section-label">Comece por uma análise</span>
         <div class="assistant-suggestions">
-            <button class="assistant-suggestion" type="button" data-question="Quais são os 3 deputados que mais gastaram com combustível?"><span>Categoria</span>Top 3 em combustível</button>
-            <button class="assistant-suggestion" type="button" data-question="Quais são os 3 deputados que mais gastaram com propaganda?"><span>Divulgação</span>Top 3 em propaganda</button>
-            <button class="assistant-suggestion" type="button" data-question="Quais são as 3 maiores categorias?"><span>Visão geral</span>Top 3 categorias</button>
-            <button class="assistant-suggestion" type="button" data-question="Quais são os 3 partidos que mais gastaram?"><span>Partidos</span>Top 3 partidos</button>
-            <button class="assistant-suggestion" type="button" data-question="Quais são os 3 fornecedores que receberam mais?"><span>Fornecedores</span>Top 3 fornecedores</button>
+            <button class="assistant-suggestion" type="button" data-question="Quem gastou mais com combustível?"><span>Categoria</span>Maior gasto com combustível</button>
+            <button class="assistant-suggestion" type="button" data-question="Quem gastou mais com propaganda?"><span>Divulgação</span>Maior gasto com propaganda</button>
+            <button class="assistant-suggestion" type="button" data-question="Quais são as maiores categorias?"><span>Visão geral</span>Ranking de categorias</button>
+            <button class="assistant-suggestion" type="button" data-question="Qual partido gastou mais?"><span>Partidos</span>Comparar despesas</button>
+            <button class="assistant-suggestion" type="button" data-question="Quais fornecedores receberam mais?"><span>Fornecedores</span>Quem recebeu os maiores valores</button>
         </div>
         <span class="assistant-section-label">Ou escreva sua pergunta</span>
         <form class="assistant-form">
