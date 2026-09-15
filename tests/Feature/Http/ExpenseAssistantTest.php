@@ -27,7 +27,7 @@ class ExpenseAssistantTest extends TestCase
             ->assertJsonPath('category', 'COMBUSTÍVEIS E LUBRIFICANTES.')
             ->assertJsonPath('items.0.label', 'Deputada Líder')
             ->assertJsonPath('items.0.value', 'R$ 750,00')
-            ->assertJsonCount(1, 'items');
+            ->assertJsonCount(2, 'items');
     }
 
     public function test_it_understands_propaganda_as_parliamentary_publicity(): void
@@ -63,7 +63,24 @@ class ExpenseAssistantTest extends TestCase
 
         $this->postJson(route('assistant.ask'), ['question' => 'Quais são as maiores categorias em 2025?'])
             ->assertOk()
-            ->assertJsonCount(5, 'items');
+            ->assertJsonCount(3, 'items');
+    }
+
+    public function test_it_returns_a_top_three_by_default_for_a_singular_question(): void
+    {
+        $deputies = Deputy::factory()->count(4)->create();
+
+        foreach ($deputies as $index => $deputy) {
+            Expense::factory()->for($deputy)->create([
+                'year' => 2025,
+                'expense_type' => 'COMBUSTÍVEIS E LUBRIFICANTES.',
+                'net_value' => 1000 - ($index * 100),
+            ]);
+        }
+
+        $this->postJson(route('assistant.ask'), ['question' => 'Quem gastou mais com combustível?', 'year' => 2025])
+            ->assertOk()
+            ->assertJsonCount(3, 'items');
     }
 
     public function test_it_aggregates_expenses_by_party(): void

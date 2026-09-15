@@ -218,11 +218,7 @@ class ExpenseAssistant
             return min(10, max(1, (int) $matches[1]));
         }
 
-        if ($this->mentions($question, ['qual ', 'quem ']) && ! str_contains($question, 'quais ')) {
-            return 1;
-        }
-
-        return 5;
+        return 3;
     }
 
     /** @return array{status: string, message: string} */
