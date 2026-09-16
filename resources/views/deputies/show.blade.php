@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/svg+xml" href="{{ asset('brand/deputados-em-dados-mark.svg') }}">
+    @include('partials.favicon')
     <title>{{ $deputy->name }} · Deputados em Dados</title>
     <style>
         :root { --ink:#17231d; --muted:#647069; --paper:#f4f1e9; --card:#fffdf8; --green:#164b35; --lime:#d9ef8b; --line:#d8ddd6; }

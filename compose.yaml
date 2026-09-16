@@ -10,6 +10,8 @@ services:
       - "8000:8000"
     volumes:
       - ./:/var/www/html
+    environment:
+      DB_HOST: mysql
     depends_on:
       mysql:
         condition: service_healthy
@@ -24,6 +26,8 @@ services:
     command: php artisan queue:work --queue=expenses,default --sleep=3 --tries=3 --timeout=120
     volumes:
       - ./:/var/www/html
+    environment:
+      DB_HOST: mysql
     depends_on:
       mysql:
         condition: service_healthy
@@ -38,6 +42,8 @@ services:
     command: php artisan schedule:work
     volumes:
       - ./:/var/www/html
+    environment:
+      DB_HOST: mysql
     depends_on:
       mysql:
         condition: service_healthy

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" type="image/svg+xml" href="{{ asset('brand/deputados-em-dados-mark.svg') }}">
+    @include('partials.favicon')
     <title>Deputados em Dados</title>
     <style>
         :root { color-scheme: light; --ink:#17231d; --muted:#647069; --paper:#f4f1e9; --card:#fffdf8; --green:#164b35; --lime:#d9ef8b; --line:#d8ddd6; }
@@ -79,7 +79,7 @@
         .insight-total { text-align:right; }
         .insight-total span,.insight-total strong { display:block; }
         .insight-total span { color:var(--muted); font-size:9px; font-weight:750; letter-spacing:.08em; text-transform:uppercase; }
-        .insight-total strong { margin-top:3px; color:var(--green); font:500 18px Georgia,serif; }
+        .insight-total strong { min-height:30px; margin-top:5px; color:var(--green); font:500 27px/1 Georgia,serif; font-variant-numeric:lining-nums tabular-nums; letter-spacing:-.02em; white-space:nowrap; }
         .month-chart { display:grid; grid-template-columns:repeat(12,1fr); align-items:end; gap:7px; height:210px; margin-top:12px; padding-top:10px; border-bottom:1px solid var(--line); background:linear-gradient(to bottom,transparent 24%,#d8ddd650 25%,transparent 26%,transparent 49%,#d8ddd650 50%,transparent 51%,transparent 74%,#d8ddd650 75%,transparent 76%); }
         .month { display:flex; height:100%; flex-direction:column; justify-content:end; align-items:center; gap:6px; color:var(--muted); font-size:10px; }
         .month i { width:100%; min-height:3px; border-radius:5px 5px 2px 2px; background:var(--green); }
@@ -138,7 +138,7 @@
         @keyframes assistant-in { from { opacity:0; transform:translateY(12px) scale(.98); } to { opacity:1; transform:none; } }
         @media (max-width:1100px) { .filters { grid-template-columns:2fr 1fr 1fr; } .filters button { grid-column:span 1; } }
         @media (max-width:900px) { .filters { grid-template-columns:1fr 1fr; } .grid { grid-template-columns:repeat(2,1fr); } .analytics { grid-template-columns:repeat(3,1fr); } .ranking { grid-column:1/-1; } .insights { grid-template-columns:1fr; } }
-        @media (max-width:600px) { header { padding-top:35px; } .filters, .grid, .analytics { grid-template-columns:1fr; } .ranking { grid-column:auto; } .summary { align-items:start; flex-direction:column; } article { min-height:190px; } .metric strong { font-size:24px; } .month-chart { gap:3px; } .assistant-toggle { right:16px; bottom:16px; } .assistant-toggle-copy small { display:none; } .assistant-panel { right:8px; bottom:82px; width:calc(100vw - 16px); max-height:calc(100vh - 96px); border-radius:18px; } .assistant-suggestions { grid-template-columns:1fr; } .assistant-suggestion:last-child { grid-column:auto; } }
+        @media (max-width:600px) { header { padding-top:35px; } .filters, .grid, .analytics { grid-template-columns:1fr; } .ranking { grid-column:auto; } .summary { align-items:start; flex-direction:column; } article { min-height:190px; } .metric strong { font-size:24px; } .insight-chart-head { align-items:flex-start; flex-direction:column; gap:10px; } .insight-total { text-align:left; } .month-chart { gap:3px; } .assistant-toggle { right:16px; bottom:16px; } .assistant-toggle-copy small { display:none; } .assistant-panel { right:8px; bottom:82px; width:calc(100vw - 16px); max-height:calc(100vh - 96px); border-radius:18px; } .assistant-suggestions { grid-template-columns:1fr; } .assistant-suggestion:last-child { grid-column:auto; } }
     </style>
     @include('partials.design-system')
 </head>
@@ -150,14 +150,14 @@
             <nav class="site-nav" aria-label="Navegação principal"><a class="active" href="{{ route('deputies.index') }}">Painel</a><a class="outline" href="{{ route('api.docs') }}">API pública ↗</a></nav>
         </div>
         <div class="hero-grid">
-            <div><div class="eyebrow">Câmara dos Deputados · Dados Abertos</div><h1>O dinheiro público, em perspectiva.</h1><p>Explore representantes, partidos, estados e despesas parlamentares em uma leitura clara, verificável e atualizada.</p></div>
-            <aside class="hero-aside"><span>Recorte em exibição</span><strong>{{ $analyticsYear }}</strong><small>{{ number_format($analytics['count'], 0, ',', '.') }} despesas importadas<br>{{ number_format($analytics['deputies'], 0, ',', '.') }} deputados com gastos</small></aside>
+            <div><div class="eyebrow">Deputados federais · Câmara dos Deputados</div><h1>O dinheiro público, em perspectiva.</h1><p>Explore deputados federais, partidos, estados e despesas parlamentares em uma leitura clara, verificável e atualizada.</p></div>
+            <aside class="hero-aside"><span>Recorte federal em exibição</span><strong>{{ $analyticsYear }}</strong><small>{{ number_format($analytics['count'], 0, ',', '.') }} despesas importadas<br>{{ number_format($analytics['deputies'], 0, ',', '.') }} deputados federais com gastos</small></aside>
         </div>
     </div>
 </header>
 <main class="wrap">
     <form class="filters" action="{{ route('deputies.index') }}" method="GET">
-        <input type="search" name="search" value="{{ request('search') }}" placeholder="Buscar pelo nome do deputado">
+        <input type="search" name="search" value="{{ request('search') }}" placeholder="Buscar deputado federal pelo nome">
         <select name="party"><option value="">Todos os partidos</option>@foreach($parties as $party)<option value="{{ $party }}" @selected(request('party') === $party)>{{ $party }}</option>@endforeach</select>
         <select name="state"><option value="">Todos os estados</option>@foreach($states as $state)<option value="{{ $state }}" @selected(request('state') === $state)>{{ $state }}</option>@endforeach</select>
         <select name="expense_year" aria-label="Ano das despesas"><option value="">Ano: {{ $analyticsYear }}</option>@foreach($availableYears as $year)<option value="{{ $year }}" @selected((string) request('expense_year') === (string) $year)>Ano: {{ $year }}</option>@endforeach</select>
@@ -166,17 +166,17 @@
     <section class="analytics-head"><div><h2>Visão geral de {{ $analyticsYear }}</h2><p>Indicadores atualizados a partir dos dados importados.</p></div></section>
     @if($analyticsSyncRun?->status === 'processing')
         <aside class="sync-notice" role="status">
-            <div><strong>Dados de {{ $analyticsYear }} em atualização</strong><small>Os indicadores são parciais enquanto as despesas dos deputados são importadas.</small></div>
-            <span class="sync-badge">{{ $analyticsSyncRun->processed_deputies }}/{{ $analyticsSyncRun->total_deputies }} deputados</span>
+            <div><strong>Dados de {{ $analyticsYear }} em atualização</strong><small>Os indicadores são parciais enquanto as despesas dos deputados federais são importadas.</small></div>
+            <span class="sync-badge">{{ $analyticsSyncRun->processed_deputies }}/{{ $analyticsSyncRun->total_deputies }} deputados federais</span>
         </aside>
     @elseif(in_array($analyticsSyncRun?->status, ['failed', 'completed_with_errors'], true))
         <aside class="sync-notice error" role="alert">
-            <div><strong>Importação de {{ $analyticsYear }} concluída com pendências</strong><small>{{ $analyticsSyncRun->failed_jobs }} {{ $analyticsSyncRun->failed_jobs === 1 ? 'deputado não foi processado' : 'deputados não foram processados' }}. Os indicadores podem estar incompletos.</small></div>
+            <div><strong>Importação de {{ $analyticsYear }} concluída com pendências</strong><small>{{ $analyticsSyncRun->failed_jobs }} {{ $analyticsSyncRun->failed_jobs === 1 ? 'deputado federal não foi processado' : 'deputados federais não foram processados' }}. Os indicadores podem estar incompletos.</small></div>
             <span class="sync-badge">Dados parciais</span>
         </aside>
     @elseif($analyticsSyncRun?->status === 'completed')
         <aside class="sync-notice complete" role="status">
-            <div><strong>Importação de {{ $analyticsYear }} concluída</strong><small>Todos os {{ $analyticsSyncRun->total_deputies }} deputados foram processados pela última sincronização.</small></div>
+            <div><strong>Importação de {{ $analyticsYear }} concluída</strong><small>Todos os {{ $analyticsSyncRun->total_deputies }} deputados federais foram processados pela última sincronização.</small></div>
             <span class="sync-badge">Dados sincronizados</span>
         </aside>
     @elseif($analytics['count'] > 0)
@@ -188,7 +188,7 @@
     <section class="analytics">
         <div class="metric"><i class="metric-index">01</i><span>Valor líquido</span><strong>R$ {{ number_format($analytics['total'], 2, ',', '.') }}</strong></div>
         <div class="metric"><i class="metric-index">02</i><span>Despesas registradas</span><strong>{{ number_format($analytics['count'], 0, ',', '.') }}</strong></div>
-        <div class="metric"><i class="metric-index">03</i><span>Deputados com gastos</span><strong>{{ number_format($analytics['deputies'], 0, ',', '.') }}</strong></div>
+        <div class="metric"><i class="metric-index">03</i><span>Deputados federais com gastos</span><strong>{{ number_format($analytics['deputies'], 0, ',', '.') }}</strong></div>
         <div class="ranking">
             <h3>Maiores categorias de despesa</h3>
             @php($largestTypeTotal = (float) ($topExpenseTypes->max('total') ?? 0))
@@ -216,7 +216,7 @@
             <div class="chart-foot"><span>Barras proporcionais ao maior mês do período</span>@if($largestMonthNumber)<span>Pico: <strong>{{ $monthNames[$largestMonthNumber] }} · R$ {{ number_format($largestMonthValue, 2, ',', '.') }}</strong></span>@endif</div>
         </div>
         <div class="insight">
-            <h3>Deputados com maiores despesas</h3>
+            <h3>Deputados federais com maiores despesas</h3>
             @forelse($topDeputies as $rankedDeputy)
                 <a class="deputy-rank" href="{{ route('deputies.show', $rankedDeputy->id) }}"><img src="{{ $rankedDeputy->photo_url }}" alt=""><span><strong>{{ $rankedDeputy->name }}</strong><small>{{ $rankedDeputy->party_acronym }} · {{ $rankedDeputy->state_acronym }}</small></span><strong>R$ {{ number_format((float) $rankedDeputy->total, 2, ',', '.') }}</strong></a>
             @empty
@@ -236,7 +236,7 @@
                     @php($progress = $run->total_deputies > 0 ? min(100, ($run->processed_deputies / $run->total_deputies) * 100) : 100)
                     <div class="run">
                         <strong>{{ $run->year }}</strong>
-                        <div><div class="run-progress"><i style="width:{{ $progress }}%"></i></div><span class="location">{{ $run->processed_deputies }}/{{ $run->total_deputies }} deputados · {{ number_format($run->expenses_received, 0, ',', '.') }} despesas</span>@if($run->last_error)<small class="run-error">{{ $run->last_error }}</small>@endif</div>
+                        <div><div class="run-progress"><i style="width:{{ $progress }}%"></i></div><span class="location">{{ $run->processed_deputies }}/{{ $run->total_deputies }} deputados federais · {{ number_format($run->expenses_received, 0, ',', '.') }} despesas</span>@if($run->last_error)<small class="run-error">{{ $run->last_error }}</small>@endif</div>
                         <span class="status">{{ match($run->status) { 'completed' => 'Concluída', 'completed_with_errors' => 'Concluída com falhas', 'failed' => 'Falhou', default => 'Em andamento' } }}</span>
                     </div>
                 @endforeach
@@ -244,7 +244,7 @@
         </section>
     @endif
     <section class="summary">
-        <div><h2>Representantes</h2><p>{{ $deputies->total() }} {{ $deputies->total() === 1 ? 'deputado encontrado' : 'deputados encontrados' }}</p></div>
+        <div><h2>Deputados federais</h2><p>{{ $deputies->total() }} {{ $deputies->total() === 1 ? 'representante federal encontrado' : 'representantes federais encontrados' }}</p></div>
         @if(request()->hasAny(['search', 'party', 'state', 'expense_year']))<a class="clear" href="{{ route('deputies.index') }}">Limpar filtros</a>@endif
     </section>
     <section class="grid">
@@ -261,7 +261,7 @@
                 </a>
             </article>
         @empty
-            <div class="empty"><strong>Nenhum deputado encontrado.</strong><br>Altere os filtros e tente novamente.</div>
+            <div class="empty"><strong>Nenhum deputado federal encontrado.</strong><br>Altere os filtros e tente novamente.</div>
         @endforelse
     </section>
     @if($deputies->hasPages())

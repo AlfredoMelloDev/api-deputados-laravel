@@ -6,5 +6,5 @@
             <path d="M21 46h25" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".7"/>
         </svg>
     </span>
-    <span class="site-brand-copy"><strong>Deputados em Dados</strong><small>Observatório de despesas públicas</small></span>
+    <span class="site-brand-copy"><strong>Deputados em Dados</strong><small>Deputados federais e despesas públicas</small></span>
 </a>

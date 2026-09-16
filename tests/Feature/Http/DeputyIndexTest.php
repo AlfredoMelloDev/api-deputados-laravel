@@ -19,6 +19,8 @@ class DeputyIndexTest extends TestCase
 
         $this->get('/')
             ->assertOk()
+            ->assertSee('Deputados federais · Câmara dos Deputados')
+            ->assertSee('Deputados federais')
             ->assertSeeInOrder(['Ana Souza', 'Zenaide Silva']);
     }
 
@@ -53,7 +55,7 @@ class DeputyIndexTest extends TestCase
             ->assertSee('Total no ano')
             ->assertSee('Pico:')
             ->assertSee('Fev · R$ 1.200,50')
-            ->assertSee('Deputados com maiores despesas')
+            ->assertSee('Deputados federais com maiores despesas')
             ->assertSeeInOrder(['Deputada Principal', 'Deputado Secundário']);
     }
 
@@ -123,7 +125,7 @@ class DeputyIndexTest extends TestCase
         $this->get('/?expense_year=2026')
             ->assertOk()
             ->assertSee('Importação de 2026 concluída')
-            ->assertSee('Todos os 513 deputados foram processados')
+            ->assertSee('Todos os 513 deputados federais foram processados')
             ->assertSee('Dados sincronizados')
             ->assertDontSee('Os indicadores são parciais');
     }
