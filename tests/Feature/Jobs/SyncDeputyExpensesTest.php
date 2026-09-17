@@ -56,6 +56,21 @@ class SyncDeputyExpensesTest extends TestCase
         $this->assertNotNull($run->refresh()->finished_at);
     }
 
+    public function test_it_accepts_alphanumeric_document_codes_from_the_api(): void
+    {
+        $deputy = Deputy::factory()->create(['camara_id' => 204554, 'legislature_id' => 57]);
+        $payload = $this->expensePayload(100.50);
+        $payload['codDocumento'] = 'A65F6C2B-69F3-4F30-9714-6A971F7560FE';
+        Http::fake(['*' => Http::response(['dados' => [$payload], 'links' => []])]);
+
+        (new SyncDeputyExpenses($deputy->id, 2026))->handle(app(CamaraApiClient::class));
+
+        $this->assertDatabaseHas('expenses', [
+            'deputy_id' => $deputy->id,
+            'document_code' => 'A65F6C2B-69F3-4F30-9714-6A971F7560FE',
+        ]);
+    }
+
     public function test_it_records_the_reason_when_a_job_fails(): void
     {
         $run = SyncRun::query()->create(['year' => 2026, 'status' => 'processing', 'total_deputies' => 1, 'started_at' => now()]);
