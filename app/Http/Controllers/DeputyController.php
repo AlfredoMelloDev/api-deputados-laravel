@@ -23,7 +23,7 @@ class DeputyController extends Controller
         ]);
 
         $availableYears = Expense::query()->distinct()->orderByDesc('year')->pluck('year');
-        $analyticsYear = (int) ($filters['expense_year'] ?? ($availableYears->contains(2025) ? 2025 : ($availableYears->first() ?? now()->year)));
+        $analyticsYear = (int) ($filters['expense_year'] ?? ($availableYears->first() ?? now()->year));
         $yearExpenses = Expense::query()->where('year', $analyticsYear);
         $analyticsSyncRun = SyncRun::query()
             ->where('year', $analyticsYear)

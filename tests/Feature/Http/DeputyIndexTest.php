@@ -59,6 +59,18 @@ class DeputyIndexTest extends TestCase
             ->assertSeeInOrder(['Deputada Principal', 'Deputado Secundário']);
     }
 
+    public function test_it_uses_the_most_recent_imported_year_by_default(): void
+    {
+        $deputy = Deputy::factory()->create();
+        Expense::factory()->for($deputy)->create(['year' => 2025, 'net_value' => 100]);
+        Expense::factory()->for($deputy)->create(['year' => 2026, 'net_value' => 200]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Visão geral de 2026')
+            ->assertSee('R$ 200,00');
+    }
+
     public function test_it_displays_the_latest_synchronization_runs(): void
     {
         SyncRun::query()->create([
