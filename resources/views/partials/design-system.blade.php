@@ -101,16 +101,29 @@
         .deputy-page .stat strong { min-width:0; margin-top:12px; text-align:left; }
     }
     @media(max-width:600px) {
-        .site-topbar { padding-bottom:26px; }
+        .site-topbar { gap:12px; padding-bottom:26px; }
+        .site-brand { min-width:0; }
+        .site-brand-copy strong { font-size:10px; }
         .site-brand-copy small,.site-nav a:not(.active):not(.outline) { display:none; }
         .dashboard header { padding-inline:16px; padding-bottom:78px; }
-        .dashboard h1 { font-size:44px; }
+        .dashboard h1 { font-size:clamp(38px,12vw,48px); }
+        .dashboard header p { font-size:13px; }
+        .dashboard .filters input,.dashboard .filters select { border-right:0; }
         .dashboard .analytics { grid-template-columns:1fr; }
         .dashboard .metric { border-right:0; border-bottom:1px solid var(--line); }
+        .dashboard .metric:nth-child(3) { border-bottom:1px solid var(--line); }
+        .dashboard .ranking { border-top:0; }
         .dashboard .grid { grid-template-columns:1fr; }
         .deputy-page .site-topbar { padding-bottom:28px; }
+        .deputy-page .site-nav .back { display:inline-flex; }
+        .deputy-page .site-nav .outline { display:none; }
         .deputy-page .profile { gap:17px; }
-        .deputy-page h1 { font-size:34px; }
+        .deputy-page h1 { font-size:30px; }
+        .deputy-page .stat { padding:20px; }
+        .deputy-page .stat strong { font-size:24px; white-space:normal; }
         .docs-page header { padding-inline:16px; }
+        .docs-page h1 { font-size:42px; }
+        .docs-page .endpoint { padding:17px; }
+        .docs-page pre { overflow-x:auto; font-size:11px; }
     }
 </style>

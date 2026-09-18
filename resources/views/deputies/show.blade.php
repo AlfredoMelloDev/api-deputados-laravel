@@ -47,7 +47,32 @@
         nav a, nav span { min-width:38px; padding:9px 11px; text-align:center; border:1px solid var(--line); border-radius:9px; color:var(--green); text-decoration:none; background:var(--card); }
         nav span.active { color:white; background:var(--green); border-color:var(--green); }
         @media(max-width:1000px) { form { grid-template-columns:repeat(2,1fr); } .supplier { grid-column:span 2; } }
-        @media(max-width:700px) { .profile { align-items:flex-start; } .profile img { width:105px; height:130px; } form { grid-template-columns:1fr; } .supplier { grid-column:auto; } .section-head { align-items:start; flex-direction:column; } }
+        @media(max-width:700px) {
+            body { overflow-x:hidden; }
+            .wrap { width:calc(100% - 24px); }
+            .profile { align-items:flex-start; gap:16px; }
+            .profile img { width:92px; height:116px; flex:0 0 auto; }
+            .deputy-page .profile h1 { overflow-wrap:anywhere; font-size:30px; }
+            .meta { font-size:12px; line-height:1.5; }
+            .section-head { align-items:start; flex-direction:column; margin-top:38px; }
+            .section-head h2 { font-size:28px; }
+            .actions { width:100%; flex-wrap:wrap; justify-content:space-between; }
+            .export { text-align:center; }
+            form { grid-template-columns:1fr; gap:8px; padding:10px; }
+            form input,form select,form button { min-height:50px; }
+            form button { width:100%; }
+            .supplier { grid-column:auto; }
+            .table-box { overflow:visible; border:0; background:transparent; }
+            table { min-width:0; }
+            thead { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; clip-path:inset(50%); }
+            tbody { display:grid; gap:10px; }
+            tr { display:grid; gap:0; overflow:hidden; border:1px solid var(--line); border-radius:14px; background:var(--card); }
+            .deputy-page td { display:grid; grid-template-columns:105px minmax(0,1fr); gap:12px; padding:11px 14px; border-bottom:1px solid var(--line); font-size:12px; overflow-wrap:anywhere; }
+            .deputy-page td:last-child { border-bottom:0; }
+            .deputy-page td::before { content:attr(data-label); color:var(--muted); font-size:9px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
+            .money { white-space:normal; }
+            nav { overflow-x:auto; justify-content:flex-start; }
+        }
     </style>
     @include('partials.design-system')
 </head>
@@ -89,11 +114,11 @@
             <table><thead><tr><th>Data</th><th>Tipo</th><th>Fornecedor</th><th>Documento</th><th>Valor líquido</th></tr></thead><tbody>
             @foreach($expenses as $expense)
                 <tr>
-                    <td>{{ $expense->document_date?->format('d/m/Y') ?? '—' }}</td>
-                    <td>{{ $expense->expense_type }}</td>
-                    <td><strong>{{ $expense->supplier_name }}</strong><small>{{ $expense->supplier_tax_id }}</small></td>
-                    <td>@if($expense->document_url)<a class="document" href="{{ $expense->document_url }}" target="_blank" rel="noopener">Ver documento ↗</a>@else{{ $expense->document_number ?: '—' }}@endif</td>
-                    <td class="money">R$ {{ number_format((float) $expense->net_value, 2, ',', '.') }}</td>
+                    <td data-label="Data">{{ $expense->document_date?->format('d/m/Y') ?? '—' }}</td>
+                    <td data-label="Tipo">{{ $expense->expense_type }}</td>
+                    <td data-label="Fornecedor"><span><strong>{{ $expense->supplier_name }}</strong><small>{{ $expense->supplier_tax_id }}</small></span></td>
+                    <td data-label="Documento">@if($expense->document_url)<a class="document" href="{{ $expense->document_url }}" target="_blank" rel="noopener">Ver documento ↗</a>@else{{ $expense->document_number ?: '—' }}@endif</td>
+                    <td class="money" data-label="Valor líquido">R$ {{ number_format((float) $expense->net_value, 2, ',', '.') }}</td>
                 </tr>
             @endforeach
             </tbody></table>

@@ -138,7 +138,55 @@
         @keyframes assistant-in { from { opacity:0; transform:translateY(12px) scale(.98); } to { opacity:1; transform:none; } }
         @media (max-width:1100px) { .filters { grid-template-columns:2fr 1fr 1fr; } .filters button { grid-column:span 1; } }
         @media (max-width:900px) { .filters { grid-template-columns:1fr 1fr; } .grid { grid-template-columns:repeat(2,1fr); } .analytics { grid-template-columns:repeat(3,1fr); } .ranking { grid-column:1/-1; } .insights { grid-template-columns:1fr; } }
-        @media (max-width:600px) { header { padding-top:35px; } .filters, .grid, .analytics { grid-template-columns:1fr; } .ranking { grid-column:auto; } .summary { align-items:start; flex-direction:column; } article { min-height:190px; } .metric strong { font-size:24px; } .insight-chart-head { align-items:flex-start; flex-direction:column; gap:10px; } .insight-total { text-align:left; } .month-chart { gap:3px; } .assistant-toggle { right:16px; bottom:16px; } .assistant-toggle-copy small { display:none; } .assistant-panel { right:8px; bottom:82px; width:calc(100vw - 16px); max-height:calc(100vh - 96px); border-radius:18px; } .assistant-suggestions { grid-template-columns:1fr; } .assistant-suggestion:last-child { grid-column:auto; } }
+        @media (max-width:600px) {
+            body { overflow-x:hidden; }
+            header { padding-top:20px; }
+            .wrap { width:calc(100% - 24px); }
+            .filters,.grid,.analytics { grid-template-columns:1fr; }
+            .dashboard .filters { gap:8px; margin-top:-34px; padding:10px; }
+            .dashboard .filters input,.dashboard .filters select,.dashboard .filters button { min-height:50px; border-right:0; border-bottom:1px solid var(--line); }
+            .dashboard .filters button { width:100%; border-bottom:0; }
+            .dashboard .analytics-head { padding-top:30px; }
+            .dashboard .analytics-head h2,.dashboard .summary h2 { font-size:29px; }
+            .sync-notice { align-items:flex-start; flex-direction:column; gap:10px; padding:14px; }
+            .sync-badge { align-self:flex-start; }
+            .dashboard .ranking { grid-column:auto; padding:18px; }
+            .rank-label { align-items:flex-start; }
+            .rank-label strong { flex:0 0 auto; font-size:10px; }
+            .summary { align-items:start; flex-direction:column; padding-top:34px; }
+            article { min-height:176px; }
+            article img { width:36%; min-width:116px; }
+            .info { min-width:0; padding:16px 13px; }
+            article h3 { overflow-wrap:anywhere; font-size:18px; }
+            .expense strong { font-size:14px; }
+            .metric strong { font-size:24px; white-space:normal; }
+            .dashboard .insight { min-width:0; padding:17px; }
+            .insight-chart-head { align-items:flex-start; flex-direction:column; gap:10px; }
+            .insight-total { text-align:left; }
+            .month-chart { grid-template-columns:repeat(12,minmax(44px,1fr)); gap:4px; overflow-x:auto; overflow-y:hidden; padding-bottom:8px; }
+            .chart-foot { align-items:flex-start; flex-direction:column; gap:5px; }
+            .deputy-rank { grid-template-columns:34px minmax(0,1fr); }
+            .deputy-rank > strong { grid-column:2; white-space:normal; }
+            .history { padding:17px; }
+            .history-head { align-items:flex-start; flex-direction:column; gap:4px; }
+            .run { grid-template-columns:1fr auto; gap:6px 12px; }
+            .run > div { grid-column:1/-1; grid-row:2; }
+            .run .status { grid-column:2; grid-row:1; }
+            nav { overflow-x:auto; justify-content:flex-start; }
+            .assistant-toggle { right:12px; bottom:12px; min-height:52px; padding:5px 13px 5px 5px; }
+            .assistant-toggle-icon { width:40px; height:40px; }
+            .assistant-toggle-copy small { display:none; }
+            .assistant-panel { right:0; bottom:0; width:100vw; max-height:calc(100dvh - 12px); border-width:1px 0 0; border-radius:20px 20px 0 0; }
+            .assistant-head { padding:19px 17px 17px; }
+            .assistant-head h2 { padding-right:4px; font-size:23px; }
+            .assistant-body { padding:16px 14px max(18px,env(safe-area-inset-bottom)); }
+            .assistant-suggestions { grid-template-columns:1fr; }
+            .assistant-suggestion:last-child { grid-column:auto; }
+            .assistant-form { grid-template-columns:1fr; }
+            .assistant-form button { width:100%; }
+            .assistant-item { grid-template-columns:28px minmax(0,1fr); }
+            .assistant-value { grid-column:2; white-space:normal; }
+        }
     </style>
     @include('partials.design-system')
 </head>
