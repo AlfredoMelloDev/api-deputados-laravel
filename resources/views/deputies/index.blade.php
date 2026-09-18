@@ -224,9 +224,9 @@
             @endforelse
         </div>
     </section>
-    @php($failedRun = $syncRuns->first(fn ($run) => in_array($run->status, ['failed', 'completed_with_errors'], true)))
-    @if($failedRun)
-        <aside class="alert" role="alert"><span>⚠</span><div><strong>A última sincronização apresentou falhas</strong><p>{{ $failedRun->last_error ?: 'Uma ou mais tarefas não puderam ser concluídas. Consulte o histórico.' }}</p></div></aside>
+    @php($latestRun = $syncRuns->first())
+    @if($latestRun && in_array($latestRun->status, ['failed', 'completed_with_errors'], true))
+        <aside class="alert" role="alert"><span>⚠</span><div><strong>A última sincronização apresentou falhas</strong><p>Uma ou mais tarefas não puderam ser concluídas. Consulte o histórico ou os registros técnicos da aplicação.</p></div></aside>
     @endif
     @if($syncRuns->isNotEmpty())
         <section class="history">
@@ -236,7 +236,7 @@
                     @php($progress = $run->total_deputies > 0 ? min(100, ($run->processed_deputies / $run->total_deputies) * 100) : 100)
                     <div class="run">
                         <strong>{{ $run->year }}</strong>
-                        <div><div class="run-progress"><i style="width:{{ $progress }}%"></i></div><span class="location">{{ $run->processed_deputies }}/{{ $run->total_deputies }} deputados federais · {{ number_format($run->expenses_received, 0, ',', '.') }} despesas</span>@if($run->last_error)<small class="run-error">{{ $run->last_error }}</small>@endif</div>
+                        <div><div class="run-progress"><i style="width:{{ $progress }}%"></i></div><span class="location">{{ $run->processed_deputies }}/{{ $run->total_deputies }} deputados federais · {{ number_format($run->expenses_received, 0, ',', '.') }} despesas</span>@if($run->last_error)<small class="run-error">Falha técnica registrada nesta execução.</small>@endif</div>
                         <span class="status">{{ match($run->status) { 'completed' => 'Concluída', 'completed_with_errors' => 'Concluída com falhas', 'failed' => 'Falhou', default => 'Em andamento' } }}</span>
                     </div>
                 @endforeach

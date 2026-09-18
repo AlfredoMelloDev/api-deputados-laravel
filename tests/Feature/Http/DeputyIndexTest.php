@@ -85,7 +85,35 @@ class DeputyIndexTest extends TestCase
             ->assertSee('42.554 despesas')
             ->assertSee('Concluída')
             ->assertSee('A última sincronização apresentou falhas')
-            ->assertSee('API indisponível');
+            ->assertSee('Falha técnica registrada nesta execução.')
+            ->assertDontSee('API indisponível');
+    }
+
+    public function test_it_does_not_warn_about_an_old_failure_after_a_successful_synchronization(): void
+    {
+        SyncRun::query()->create([
+            'year' => 2026,
+            'status' => 'failed',
+            'last_error' => 'SQLSTATE: informação técnica sensível',
+            'started_at' => now()->subMinute(),
+            'finished_at' => now()->subMinute(),
+        ]);
+        SyncRun::query()->create([
+            'year' => 2026,
+            'status' => 'completed',
+            'total_deputies' => 513,
+            'processed_deputies' => 513,
+            'successful_jobs' => 513,
+            'expenses_received' => 48931,
+            'started_at' => now(),
+            'finished_at' => now(),
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertDontSee('A última sincronização apresentou falhas')
+            ->assertDontSee('SQLSTATE: informação técnica sensível')
+            ->assertSee('Falha técnica registrada nesta execução.');
     }
 
     public function test_it_warns_when_the_selected_year_is_still_being_synchronized(): void
