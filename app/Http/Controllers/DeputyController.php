@@ -83,6 +83,7 @@ class DeputyController extends Controller
 
         return view('deputies.index', [
             'deputies' => $deputies,
+            'deputyNames' => Deputy::query()->orderBy('name')->pluck('name'),
             'parties' => Deputy::query()->whereNotNull('party_acronym')->distinct()->orderBy('party_acronym')->pluck('party_acronym'),
             'states' => Deputy::query()->whereNotNull('state_acronym')->distinct()->orderBy('state_acronym')->pluck('state_acronym'),
             'availableYears' => $availableYears,

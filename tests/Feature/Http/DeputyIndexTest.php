@@ -33,8 +33,19 @@ class DeputyIndexTest extends TestCase
         $this->get('/?search=Ana&party=PT&state=SP')
             ->assertOk()
             ->assertSee('Ana Souza')
-            ->assertDontSee('Ana Lima')
-            ->assertDontSee('Carlos Souza');
+            ->assertDontSee('Foto de Ana Lima')
+            ->assertDontSee('Foto de Carlos Souza');
+    }
+
+    public function test_it_provides_alphabetical_names_for_search_suggestions(): void
+    {
+        Deputy::factory()->create(['name' => 'Zenaide Silva']);
+        Deputy::factory()->create(['name' => 'Ana Souza']);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('aria-autocomplete="list"', false)
+            ->assertViewHas('deputyNames', fn ($names) => $names->all() === ['Ana Souza', 'Zenaide Silva']);
     }
 
     public function test_it_displays_analytics_for_the_selected_expense_year(): void

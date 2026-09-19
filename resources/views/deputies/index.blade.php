@@ -17,6 +17,13 @@
         header p { max-width:620px; margin:0; color:#d7e3dc; line-height:1.6; }
         .api-link { display:inline-block; margin-top:18px; padding:9px 13px; border:1px solid #ffffff55; border-radius:9px; color:white; font-size:13px; font-weight:700; text-decoration:none; }
         .filters { position:relative; margin-top:-38px; padding:18px; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:0 14px 40px #1a33231a; display:grid; grid-template-columns:minmax(260px,2fr) minmax(150px,1fr) minmax(150px,1fr) minmax(125px,.75fr) auto; gap:12px; }
+        .search-autocomplete { position:relative; min-width:0; }
+        .search-autocomplete input { height:100%; }
+        .search-suggestions { position:absolute; top:calc(100% + 7px); right:0; left:0; z-index:30; display:grid; gap:3px; max-height:310px; margin:0; padding:6px; overflow-y:auto; border:1px solid var(--line); border-radius:12px; background:var(--card); box-shadow:0 18px 45px #10291d26; list-style:none; }
+        .search-suggestions[hidden] { display:none; }
+        .search-suggestion { width:100%; min-height:42px; padding:9px 11px; border-radius:8px; background:transparent; color:var(--ink); font-size:12px; font-weight:650; line-height:1.35; text-align:left; }
+        .search-suggestion:hover,.search-suggestion.active { background:#edf3ee; color:var(--green); }
+        .search-suggestion small { display:block; margin-top:2px; color:var(--muted); font-size:9px; font-weight:600; }
         input, select, button, .clear { min-height:48px; border-radius:10px; font:inherit; }
         input, select { width:100%; padding:0 14px; background:white; border:1px solid var(--line); color:var(--ink); }
         button { padding:0 22px; border:0; background:var(--green); color:white; font-weight:750; cursor:pointer; }
@@ -144,6 +151,7 @@
             .wrap { width:calc(100% - 24px); }
             .filters,.grid,.analytics { grid-template-columns:1fr; }
             .dashboard .filters { gap:8px; margin-top:-34px; padding:10px; }
+            .search-suggestions { max-height:260px; }
             .dashboard .filters input,.dashboard .filters select,.dashboard .filters button { min-height:50px; border-right:0; border-bottom:1px solid var(--line); }
             .dashboard .filters button { width:100%; border-bottom:0; }
             .dashboard .analytics-head { padding-top:30px; }
@@ -206,7 +214,10 @@
 </header>
 <main class="wrap">
     <form class="filters" action="{{ route('deputies.index') }}" method="GET">
-        <input type="search" name="search" value="{{ request('search') }}" placeholder="Buscar deputado federal pelo nome">
+        <div class="search-autocomplete">
+            <input type="search" name="search" value="{{ request('search') }}" placeholder="Buscar deputado federal pelo nome" autocomplete="off" aria-label="Buscar deputado federal pelo nome" aria-autocomplete="list" aria-expanded="false" aria-controls="deputy-suggestions">
+            <ul class="search-suggestions" id="deputy-suggestions" role="listbox" aria-label="Sugestões de deputados federais" hidden></ul>
+        </div>
         <select name="party"><option value="">Todos os partidos</option>@foreach($parties as $party)<option value="{{ $party }}" @selected(request('party') === $party)>{{ $party }}</option>@endforeach</select>
         <select name="state"><option value="">Todos os estados</option>@foreach($states as $state)<option value="{{ $state }}" @selected(request('state') === $state)>{{ $state }}</option>@endforeach</select>
         <select name="expense_year" aria-label="Ano das despesas"><option value="">Ano: {{ $analyticsYear }}</option>@foreach($availableYears as $year)<option value="{{ $year }}" @selected((string) request('expense_year') === (string) $year)>Ano: {{ $year }}</option>@endforeach</select>
@@ -349,6 +360,96 @@
     </div>
 </aside>
 <script>
+    (() => {
+        const form = document.querySelector('.filters');
+        const input = form.elements.search;
+        const list = document.querySelector('.search-suggestions');
+        const names = @json($deputyNames);
+        let matches = [];
+        let activeIndex = -1;
+
+        const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').trim();
+        const close = () => {
+            list.hidden = true;
+            list.replaceChildren();
+            input.setAttribute('aria-expanded', 'false');
+            input.removeAttribute('aria-activedescendant');
+            activeIndex = -1;
+        };
+        const select = name => {
+            input.value = name;
+            close();
+            form.requestSubmit();
+        };
+        const activate = index => {
+            const options = [...list.querySelectorAll('.search-suggestion')];
+            options.forEach(option => option.classList.remove('active'));
+            activeIndex = index;
+            if (activeIndex < 0 || !options[activeIndex]) {
+                input.removeAttribute('aria-activedescendant');
+                return;
+            }
+            options[activeIndex].classList.add('active');
+            options[activeIndex].scrollIntoView({ block: 'nearest' });
+            input.setAttribute('aria-activedescendant', options[activeIndex].id);
+        };
+        const render = () => {
+            const query = normalize(input.value);
+            if (query.length < 2) {
+                close();
+                return;
+            }
+
+            matches = names.filter(name => normalize(name).includes(query)).slice(0, 8);
+            list.replaceChildren();
+            activeIndex = -1;
+            if (matches.length === 0) {
+                close();
+                return;
+            }
+
+            matches.forEach((name, index) => {
+                const item = document.createElement('li');
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.id = `deputy-suggestion-${index}`;
+                button.className = 'search-suggestion';
+                button.setAttribute('role', 'option');
+                button.textContent = name;
+                const hint = document.createElement('small');
+                hint.textContent = 'Selecionar deputado federal';
+                button.append(hint);
+                button.addEventListener('pointerdown', event => event.preventDefault());
+                button.addEventListener('click', () => select(name));
+                item.append(button);
+                list.append(item);
+            });
+            list.hidden = false;
+            input.setAttribute('aria-expanded', 'true');
+        };
+
+        input.addEventListener('input', render);
+        input.addEventListener('focus', render);
+        input.addEventListener('keydown', event => {
+            if (list.hidden || matches.length === 0) return;
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                activate((activeIndex + 1) % matches.length);
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                activate((activeIndex - 1 + matches.length) % matches.length);
+            } else if (event.key === 'Enter' && activeIndex >= 0) {
+                event.preventDefault();
+                select(matches[activeIndex]);
+            } else if (event.key === 'Escape') {
+                close();
+            }
+        });
+        document.addEventListener('pointerdown', event => {
+            if (!event.target.closest('.search-autocomplete')) close();
+        });
+    })();
+
     (() => {
         const toggle = document.querySelector('.assistant-toggle');
         const panel = document.querySelector('.assistant-panel');
