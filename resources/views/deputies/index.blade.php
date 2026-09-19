@@ -151,8 +151,9 @@
             .sync-notice { align-items:flex-start; flex-direction:column; gap:10px; padding:14px; }
             .sync-badge { align-self:flex-start; }
             .dashboard .ranking { grid-column:auto; padding:18px; }
-            .rank-label { align-items:flex-start; }
-            .rank-label strong { flex:0 0 auto; font-size:10px; }
+            .rank-label { align-items:flex-start; flex-direction:column; gap:3px; }
+            .rank-label span { width:100%; white-space:normal; overflow-wrap:anywhere; }
+            .rank-label strong { max-width:100%; font-size:10px; white-space:normal; }
             .summary { align-items:start; flex-direction:column; padding-top:34px; }
             article { min-height:176px; }
             article img { width:36%; min-width:116px; }

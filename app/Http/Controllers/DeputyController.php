@@ -73,6 +73,14 @@ class DeputyController extends Controller
             ->paginate(18)
             ->withQueryString();
 
+        $syncRuns = SyncRun::query()
+            ->latest('started_at')
+            ->latest('id')
+            ->get()
+            ->unique('year')
+            ->take(5)
+            ->values();
+
         return view('deputies.index', [
             'deputies' => $deputies,
             'parties' => Deputy::query()->whereNotNull('party_acronym')->distinct()->orderBy('party_acronym')->pluck('party_acronym'),
@@ -84,7 +92,7 @@ class DeputyController extends Controller
             'monthlyExpenses' => $monthlyExpenses,
             'topDeputies' => $topDeputies,
             'analyticsSyncRun' => $analyticsSyncRun,
-            'syncRuns' => SyncRun::query()->latest('started_at')->limit(5)->get(),
+            'syncRuns' => $syncRuns,
         ]);
     }
 

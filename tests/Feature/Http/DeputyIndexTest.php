@@ -123,9 +123,14 @@ class DeputyIndexTest extends TestCase
 
         $this->get('/')
             ->assertOk()
+            ->assertViewHas('syncRuns', fn ($runs) => $runs->count() === 1
+                && $runs->first()->year === 2026
+                && $runs->first()->status === 'completed')
             ->assertDontSee('A última sincronização apresentou falhas')
             ->assertDontSee('SQLSTATE: informação técnica sensível')
-            ->assertSee('Falha técnica registrada nesta execução.');
+            ->assertDontSee('Falha técnica registrada nesta execução.')
+            ->assertSee('48.931 despesas')
+            ->assertSee('Concluída');
     }
 
     public function test_it_warns_when_the_selected_year_is_still_being_synchronized(): void
